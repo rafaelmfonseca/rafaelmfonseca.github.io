@@ -1,0 +1,549 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Rafael Moreira Fonseca</title><link>https://rafaelmfonseca.github.io/posts/</link><description>Recent content in Posts on Rafael Moreira Fonseca</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Wed, 25 May 2022 12:00:00 +0000</lastBuildDate><atom:link href="https://rafaelmfonseca.github.io/posts/index.xml" rel="self" type="application/rss+xml"/><item><title>Você conhece a técnica de geração procedural em jogos digitais?</title><link>https://rafaelmfonseca.github.io/posts/geracao-procedural/</link><pubDate>Wed, 25 May 2022 12:00:00 +0000</pubDate><guid>https://rafaelmfonseca.github.io/posts/geracao-procedural/</guid><description>A geração procedural é um assunto que vem se popularizando nos últimos anos entre os desenvolvedores de jogos indies. A utilização dessa técnica para geração de leveis e terrenos de jogos é adotado por programadores que não desejam limitar o conteúdo de seus games, abrindo portas para criar uma quantidade infinita de recursos. Hoje, vamos discurtir as principais vantagens e desvantagens de usar esse tipo de técnica, e saber quando a utilização desses algorítmos pode se tornar favorável para o seu projeto.</description><content type="html"><![CDATA[<p>A geração procedural é um assunto que vem se popularizando nos últimos anos entre os desenvolvedores de jogos indies. <br>
+A utilização dessa técnica para geração de leveis e terrenos de jogos é adotado por programadores que não desejam limitar o conteúdo de seus games, abrindo portas para criar uma quantidade infinita de recursos. Hoje, vamos discurtir as principais vantagens e desvantagens de usar esse tipo de técnica, e saber quando a utilização desses algorítmos pode se tornar favorável para o seu projeto.</p>
+<h2 id="afinal-o-que-são-esses-algoritmos-procedurais">Afinal, o que são esses algoritmos procedurais?</h2>
+<p>É uma abordagem de junção de vários algoritmos e/ou dados aleatórios que são encadeados para gerar valores com formatos conhecidos e úteis. Um dos exemplos mais famosos é o cálculo do matemático Ken Perlin, o Perlin Noise, onde o seu resultado pode ser usado para criar imagens parecidas com essa:</p>
+<p><img src="2022-05-27-12-14-17.png" alt=""></p>
+<center><i style="font-size: 12px;">[Imagem gerada com perlin noise.]</i></center>
+<p>É importante observar que a imagem é composta por variações de apenas duas cores: preto e branco, <strong>sendo a cor preta representado pelo valor 0.0f e a branca pelo valor 1.0f</strong>. No game engine Unity, cada pixel pode ser gerado utilizando o método estático <code>Mathf.PerlinNoise(x, y)</code>, mas para isso você também deve informar as coordenadas x e y.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">UnityEngine</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">UnityEngine.UI</span><span class="p">;</span>
+
+<span class="c1">/// &lt;summary&gt;
+</span><span class="c1">/// Classe responsável por criar uma textura e preenchê-la com perlin noise.
+</span><span class="c1">/// Alterar o valor do campo &#34;noiseScale&#34; pode gerar resultados diferentes.
+</span><span class="c1">/// &lt;/summary&gt;
+</span><span class="c1"></span><span class="k">public</span> <span class="k">class</span> <span class="nc">GeracaoProcedural</span> <span class="p">:</span> <span class="n">MonoBehaviour</span>
+<span class="p">{</span>
+<span class="na">    [SerializeField]</span> <span class="k">public</span> <span class="n">RawImage</span> <span class="n">image</span><span class="p">;</span>
+<span class="na">    [SerializeField]</span> <span class="k">public</span> <span class="kt">int</span> <span class="n">textureWidth</span> <span class="p">=</span> <span class="m">256</span><span class="p">;</span>
+<span class="na">    [SerializeField]</span> <span class="k">public</span> <span class="kt">int</span> <span class="n">textureHeight</span> <span class="p">=</span> <span class="m">256</span><span class="p">;</span>
+<span class="na">    [SerializeField]</span> <span class="k">public</span> <span class="kt">float</span> <span class="n">noiseScale</span> <span class="p">=</span> <span class="m">30.0f</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">void</span> <span class="n">Start</span><span class="p">()</span> <span class="p">=&gt;</span> <span class="n">GenerateNoise</span><span class="p">();</span>
+
+    <span class="k">private</span> <span class="k">void</span> <span class="n">GenerateNoise</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">texture</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Texture2D</span><span class="p">(</span><span class="n">textureWidth</span><span class="p">,</span> <span class="n">textureHeight</span><span class="p">);</span>
+        <span class="kt">var</span> <span class="n">colors</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Color32</span><span class="p">[</span><span class="n">texture</span><span class="p">.</span><span class="n">width</span> <span class="p">*</span> <span class="n">texture</span><span class="p">.</span><span class="n">height</span><span class="p">];</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">x</span> <span class="p">&lt;</span> <span class="n">texture</span><span class="p">.</span><span class="n">width</span><span class="p">;</span> <span class="n">x</span><span class="p">++)</span>
+        <span class="p">{</span>
+            <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">y</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">y</span> <span class="p">&lt;</span> <span class="n">texture</span><span class="p">.</span><span class="n">height</span><span class="p">;</span> <span class="n">y</span><span class="p">++)</span>
+            <span class="p">{</span>
+                <span class="kt">float</span> <span class="n">xCoord</span> <span class="p">=</span> <span class="n">x</span> <span class="p">/</span> <span class="n">noiseScale</span><span class="p">;</span>
+                <span class="kt">float</span> <span class="n">yCoord</span> <span class="p">=</span> <span class="n">y</span> <span class="p">/</span> <span class="n">noiseScale</span><span class="p">;</span>
+                <span class="kt">byte</span> <span class="n">noiseValue</span> <span class="p">=</span> <span class="p">(</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="n">Mathf</span><span class="p">.</span><span class="n">PerlinNoise</span><span class="p">(</span><span class="n">xCoord</span><span class="p">,</span> <span class="n">yCoord</span><span class="p">)</span> <span class="p">*</span> <span class="m">255</span><span class="p">);</span>
+
+                <span class="n">colors</span><span class="p">[</span><span class="n">y</span> <span class="p">*</span> <span class="n">texture</span><span class="p">.</span><span class="n">width</span> <span class="p">+</span> <span class="n">x</span><span class="p">]</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Color32</span><span class="p">(</span><span class="n">noiseValue</span><span class="p">,</span> <span class="n">noiseValue</span><span class="p">,</span> <span class="n">noiseValue</span><span class="p">,</span> <span class="m">255</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="n">texture</span><span class="p">.</span><span class="n">SetPixels32</span><span class="p">(</span><span class="n">colors</span><span class="p">);</span>
+        <span class="n">texture</span><span class="p">.</span><span class="n">Apply</span><span class="p">();</span>
+
+        <span class="n">image</span><span class="p">.</span><span class="n">texture</span> <span class="p">=</span> <span class="n">texture</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><p>Imaginando o cenário de que o valor <strong>1.0f</strong> pode ser o ponto mais alto de uma montanha, o <strong>Perlin Noise possibilita a geração de terrenos proceduralmente</strong>:</p>
+<p><img src="2022-05-25-16-11-38.png" alt=""></p>
+<center><i style="font-size: 12px;">[Terreno configurado a partir do valores gerado pelo perlin noise.]</i></center>
+<h2 id="em-busca-do-realismo-utilizando-a-combinações-de-algoritmos">Em busca do realismo utilizando a combinações de algoritmos</h2>
+<p>Só o Perlin Noise não é suficiente, para tornar o cenário agradável aos olhos dos jogadores, a combinações de <strong>noises</strong> se torna crucial na criação de terrenos. Na imagem abaixo utilizei os algoritmos: <strong>Perlin Noise</strong>, <strong>Erosion</strong>, <strong>Terrace</strong> e <strong>Shore Line</strong>.</p>
+<p><img src="2022-05-25-16-22-14.png" alt=""></p>
+<center><i style="font-size: 12px;">[Terreno mais detalhado usando combinações de algoritmos.]</i></center>
+<h2 id="mas-todas-essas-combinações-de-algoritmos-impactam-na-performance">Mas todas essas combinações de algoritmos impactam na performance?</h2>
+<p>A geração procedural exige um alto processamento da CPU para realizar os cálculos em tempo de execução, principalmente se o terreno for gerado automaticamente em volta do Player. Utilizando as técnicas de otimizações corretas, como a divisão do terrenos em chunks (dividir um grande terreno em partes) e a aplicação de object pooling (reutilização de objetos descartados), é possível alcançar resultados em que o processamento fique imperceptível para o usuário. <br></p>
+<p><img src="2022-05-26-10-50-26.png" alt=""></p>
+<center><i style="font-size: 12px;">[Terreno dividido em 9 partes (chunks).]</i></center>
+<h2 id="geração-procedural-está-presente-em-todo-lugar">Geração procedural está presente em todo lugar</h2>
+<p>Os setores de efeitos visuais e videogames usam a geração procedural para a criação de materiais PBR e texturas 3D. <br>
+Hoje, a Adobe lidera a indústria de criação de materiais com seu software premiado: Substance Designer. <br>
+Essa ferramenta pode auxiliar e gerar variações infinitas de texturas através de nós interligados.</p>
+<p><img src="2022-05-26-11-23-12.png" alt=""></p>
+<center><i style="font-size: 12px;">[Textura de couro renderizado pelo Substance Designer]</i></center>
+<h2 id="nem-tudo-é-perfeito">Nem tudo é perfeito</h2>
+<p>Infelizmente, com o tempo, você pode notar padrões nas soluções procedurais, as repetições ficam claras e o ambiente pode não ser tão diverso. Para evitar que o jogador note demais essas estruturas repetitivas, cria-se uma necessidade de usar combinações de ambientes feitos à mão com ferramentas que utilizam algoritmos procedurais.</p>
+<p><img src="2022-05-26-14-31-02.png" alt=""></p>
+<center><i style="font-size: 12px;">[Repetição de objetos no planeta gerado proceduralmente pelo jogo "No Man's Sky".]</i></center>
+<h3 id="vantagens">Vantagens</h3>
+<ul>
+<li>Permite criar conteúdo dinamicamente.</li>
+<li>É possível a geração de terrenos gigantes e recursos infinitos.</li>
+<li>Alta reusabilidade, alterar apenas alguns valores e parâmetros pode gerar um novo conteúdo.</li>
+</ul>
+<h3 id="desvantagens">Desvantagens</h3>
+<ul>
+<li>O conteúdo gerado proceduralmente pode parecer repetitivo e entediante.</li>
+<li>A geração depende da potência do hardware.</li>
+<li>Exige mais conhecimento de programação.</li>
+</ul>
+<h2 id="conclusão">Conclusão</h2>
+<p>Por fim, esse artigo faz reflexão de que as ferramentas e algoritmos procedurais são técnicas incríveis na programação de jogos, isso ajuda automatizar a criação de certos dados. Vários jogos geram ambientes ou criaturas proceduralmente durante o produto final, mas vale você avaliar se o seu projeto se encaixa nessa categoria.</p>
+]]></content></item><item><title>Design Pattern: Expor versão não genérica de interfaces genéricas</title><link>https://rafaelmfonseca.github.io/posts/design-pattern-expor-versao-nao-generica-interfaces-generica/</link><pubDate>Fri, 24 Dec 2021 01:52:00 +0000</pubDate><guid>https://rafaelmfonseca.github.io/posts/design-pattern-expor-versao-nao-generica-interfaces-generica/</guid><description>Se você está familiarizado com o ambiente .NET, com certeza já ouviu falar da interface IEnumerable&amp;lt;T&amp;gt; utilizada para iterar listas em instruções foreach, porém antes do namespace System.Collections.Generic ser criado, existia apenas o IEnumerable(não genérico) do namespace System.Collections.
+Hoje, IEnumerable&amp;lt;T&amp;gt; estende de IEnumerable:
+namespace System.Collections { public interface IEnumerable { IEnumerator GetEnumerator(); } } namespace System.Collections.Generic { public interface IEnumerable&amp;lt;out T&amp;gt; : IEnumerable { new IEnumerator&amp;lt;T&amp;gt; GetEnumerator(); } } Veja as vantagens de implementar esse padrão: Essa herança faz sentido para não quebrar códigos legado e permite mais generalidade, fornecendo uma implementação não genérica para os consumidores.</description><content type="html"><![CDATA[<p>Se você está familiarizado com o ambiente .NET, com certeza já ouviu falar da interface <code>IEnumerable&lt;T&gt;</code> utilizada para iterar listas em instruções <code>foreach</code>, porém antes do namespace <code>System.Collections.Generic</code> ser criado, existia apenas o <code>IEnumerable</code>(não genérico) do namespace <code>System.Collections</code>.</p>
+<p>Hoje, <code>IEnumerable&lt;T&gt;</code> estende de <code>IEnumerable</code>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="k">namespace</span> <span class="nn">System.Collections</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">interface</span> <span class="n">IEnumerable</span>
+    <span class="p">{</span>
+        <span class="n">IEnumerator</span> <span class="n">GetEnumerator</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">namespace</span> <span class="nn">System.Collections.Generic</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">interface</span> <span class="n">IEnumerable</span><span class="p">&lt;</span><span class="k">out</span> <span class="n">T</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">IEnumerable</span>
+    <span class="p">{</span>
+        <span class="k">new</span> <span class="n">IEnumerator</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="n">GetEnumerator</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h2 id="veja-as-vantagens-de-implementar-esse-padrão">Veja as vantagens de implementar esse padrão:</h2>
+<ul>
+<li>Essa herança faz sentido para não quebrar códigos legado e permite mais generalidade, fornecendo uma implementação não genérica para os consumidores.</li>
+<li>Durante o uso do operador <code>is</code>, não é necessário informar o tipo do genérico.</li>
+</ul>
+<p>Exemplo:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="kt">object</span> <span class="n">validator</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ValidatorImpl</span><span class="p">();</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">validator</span> <span class="k">is</span> <span class="n">Validator</span><span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;)</span> <span class="cm">/** Precisa informar o tipo **/</span>
+<span class="p">{</span>
+
+<span class="p">}</span>
+<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">validator</span> <span class="k">is</span> <span class="n">Validator</span><span class="p">)</span> <span class="cm">/** Não precisa informar o tipo **/</span>
+<span class="p">{</span>
+
+<span class="p">}</span>
+</code></pre></div><p>Fontes: <br>
+<a href="https://stackoverflow.com/questions/9197465/">https://stackoverflow.com/questions/9197465/</a> <br>
+<a href="https://stackoverflow.com/questions/6623188/">https://stackoverflow.com/questions/6623188/</a> <br>
+<a href="https://gamedev.stackexchange.com/questions/145037/">https://gamedev.stackexchange.com/questions/145037/</a> <br>
+<a href="https://stackoverflow.com/questions/16112353/">https://stackoverflow.com/questions/16112353/</a> <br>
+<a href="https://whatheco.de/2015/12/15/non-generic-wrapper-instead-of-base-class-or-interface/">https://whatheco.de/2015/12/15/non-generic-wrapper-instead-of-base-class-or-interface/</a> <br>
+<a href="https://whatheco.de/2011/07/02/casting-to-less-generic-types/">https://whatheco.de/2011/07/02/casting-to-less-generic-types/</a> <br></p>
+]]></content></item><item><title>Análise Open Source - Parte 2</title><link>https://rafaelmfonseca.github.io/posts/analise-open-source-parte-2/</link><pubDate>Thu, 23 Dec 2021 22:08:00 +0000</pubDate><guid>https://rafaelmfonseca.github.io/posts/analise-open-source-parte-2/</guid><description>Hoje é dia de estudar o projeto FluentValidation/FluentValidation, uma biblioteca simples se comparada com o EFCore, mas acredito que a vamos conseguir extrair alguns padrões interessantes com seu código.
+AbstractValidator.cs AbstractValidator é a classe abstrata principal que declara as validações de um determinado model/entity.
+src/FluentValidation/AbstractValidator.cs
+#region License // Copyright (c) .NET Foundation and contributors. // ... #endregion namespace FluentValidation { using System; using System.Collections.Generic; /** ... **/ public abstract class AbstractValidator&amp;lt;T&amp;gt; : IValidator&amp;lt;T&amp;gt;, IEnumerable&amp;lt;IValidationRule&amp;gt; { /** .</description><content type="html"><![CDATA[<p>Hoje é dia de estudar o projeto <a href="https://github.com/FluentValidation/FluentValidation">FluentValidation/FluentValidation</a>, uma biblioteca simples se comparada com o EFCore, mas acredito que a vamos conseguir extrair alguns padrões interessantes com seu código.</p>
+<h2 id="abstractvalidatorcs">AbstractValidator.cs</h2>
+<p><code>AbstractValidator</code> é a classe abstrata principal que declara as validações de um determinado model/entity.</p>
+<p><code>src/FluentValidation/AbstractValidator.cs</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="cp">#region License
+</span><span class="cp"></span><span class="c1">// Copyright (c) .NET Foundation and contributors.
+</span><span class="c1">// ...
+</span><span class="c1"></span><span class="cp">#endregion
+</span><span class="cp"></span><span class="k">namespace</span> <span class="nn">FluentValidation</span> <span class="p">{</span>
+	<span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+	<span class="k">using</span> <span class="nn">System.Collections.Generic</span><span class="p">;</span>
+    <span class="cm">/** ... **/</span>
+
+    <span class="k">public</span> <span class="k">abstract</span> <span class="k">class</span> <span class="nc">AbstractValidator</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="p">:</span> <span class="n">IValidator</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;,</span> <span class="n">IEnumerable</span><span class="p">&lt;</span><span class="n">IValidationRule</span><span class="p">&gt;</span> <span class="p">{</span>
+        <span class="cm">/** ... **/</span>
+        <span class="k">internal</span> <span class="n">TrackingCollection</span><span class="p">&lt;</span><span class="n">IValidationRuleInternal</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;&gt;</span> <span class="n">Rules</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="k">new</span><span class="p">();</span>
+
+        <span class="cm">/** .. **/</span>
+        <span class="n">ValidationResult</span> <span class="n">IValidator</span><span class="p">.</span><span class="n">Validate</span><span class="p">(</span><span class="n">IValidationContext</span> <span class="n">context</span><span class="p">)</span> <span class="p">{</span>
+			<span class="n">context</span><span class="p">.</span><span class="n">Guard</span><span class="p">(</span><span class="s">&#34;Cannot pass null to Validate&#34;</span><span class="p">,</span> <span class="n">nameof</span><span class="p">(</span><span class="n">context</span><span class="p">));</span>
+			<span class="k">return</span> <span class="n">Validate</span><span class="p">(</span><span class="n">ValidationContext</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;.</span><span class="n">GetFromNonGenericContext</span><span class="p">(</span><span class="n">context</span><span class="p">));</span>
+		<span class="p">}</span>
+
+        <span class="cm">/** .. **/</span>
+        <span class="k">public</span> <span class="n">IEnumerator</span><span class="p">&lt;</span><span class="n">IValidationRule</span><span class="p">&gt;</span> <span class="n">GetEnumerator</span><span class="p">()</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="n">Rules</span><span class="p">.</span><span class="n">GetEnumerator</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="n">IEnumerator</span> <span class="n">IEnumerable</span><span class="p">.</span><span class="n">GetEnumerator</span><span class="p">()</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="n">GetEnumerator</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h2 id="analisando-abstractvalidatorcs">Analisando AbstractValidator.cs:</h2>
+<ul>
+<li><span style="color:#8bc34a;">O arquivo começa com um avisos de direitos autorais.</span></li>
+</ul>
+<blockquote>
+<p><code>“It is always a good idea to include copyright notices at the top of each source code file and to comment on your namespaces, interfaces, classes, enums, structs, methods, and properties. Your copyright comments should be first in the source file, above the using statements and take the form of a multiline comment that starts with /* and ends with */.” - Jason Alls</code></p>
+</blockquote>
+<ul>
+<li>
+<p><span style="color:#ff7a8c;">Aqui é utilizado a antiga declaração de namespace, e as instruções de using estão dentro do namespace, estranho né?</span></p>
+</li>
+<li>
+<p><span style="color:#8bc34a;">O método <code>IValidator.Validate(context)</code> retorna um <code>ValidationResult</code>.</span></p>
+</li>
+<li>
+<p><span style="color:#8bc34a;">A classe implementa <code>IValidator&lt;in T&gt;</code> e <code>IEnumerable</code> explicitamente(mas também implicitamente). EF Core fez o mesmo, aparentemente isso está se tornando um padrão, força o usuário a não declarar variáveis de tipos concretos(classes).</span></p>
+</li>
+<li>
+<p><span style="color:#8bc34a;"><code>IValidator&lt;in T&gt;</code>(a versão genérica) permite utilizar interfaces em injeções de dependência. A interface <code>IValidator</code> (não genérica) existe também.</span></p>
+</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="k">public</span> <span class="k">class</span> <span class="nc">Startup</span>
+<span class="p">{</span>
+    <span class="cm">/** ... **/</span>
+    <span class="k">public</span> <span class="k">void</span> <span class="n">ConfigureServices</span><span class="p">(</span><span class="n">IServiceCollection</span> <span class="n">services</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="cm">/** ... **/</span>
+        <span class="n">services</span><span class="p">.</span><span class="n">AddScoped</span><span class="p">&lt;</span><span class="n">IValidator</span><span class="p">&lt;</span><span class="n">User</span><span class="p">&gt;,</span> <span class="n">UserValidator</span><span class="p">&gt;();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><ul>
+<li><span style="color:#8bc34a;"><code>AbstractValidator&lt;T&gt;</code> é uma classe abstrata, portanto não pode ser instânciada. No EF Core a classe de inicialização é a <code>DbContext.cs</code>, no entanto não é abstrata.</span></li>
+</ul>
+<blockquote>
+<p><code>Typically you create a class that derives from DbContext and contains DbSet&lt;TEntity&gt; properties for each entity in the model. (EF Core)</code></p>
+</blockquote>
+<ul>
+<li><span style="color:#8bc34a;"><code>TrackingCollection</code> é instânciado utilizando a nova sintaxe <code>new()</code>.</span></li>
+</ul>
+<p><img src="2021-12-23-22-56-52.png" alt=""></p>
+<ul>
+<li><span style="color:#8bc34a;">A verificação por parâmetros nulos ou vazios é feita pelo método de extensão <code>ExtensionsInternal.Guard(this object obj, string message, string paramName)</code> (parecido com o <code>Check.NotNull()</code> do EF Core). Os métodos da classe <code>ExtensionsInternal</code> são <code>internal</code>, só podem ser utilizadas dentro da mesma assembly/dll.</span></li>
+</ul>
+<h2 id="validationresultcs">ValidationResult.cs</h2>
+<p><code>ValidationResult</code> é a classe que representa o resultado de uma validação.</p>
+<p><code>src/FluentValidation/ValidationResult.cs</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="na">[Serializable]</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">ValidationResult</span> <span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">ValidationFailure</span><span class="p">&gt;</span> <span class="m">_</span><span class="n">errors</span><span class="p">;</span>
+
+    <span class="cm">/** ... **/</span>
+    <span class="k">public</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">ValidationFailure</span><span class="p">&gt;</span> <span class="n">Errors</span> <span class="p">=&gt;</span> <span class="m">_</span><span class="n">errors</span><span class="p">;</span>
+
+    <span class="cm">/** ... **/</span>
+    <span class="k">public</span> <span class="n">ValidationResult</span><span class="p">()</span> <span class="p">{</span>
+        <span class="m">_</span><span class="n">errors</span> <span class="p">=</span> <span class="k">new</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">ValidationFailure</span><span class="p">&gt;();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h2 id="analisando-validationresultcs">Analisando ValidationResult.cs:</h2>
+<ul>
+<li><span style="color:#8bc34a;">O campo <code>_errors</code> é readonly, sendo possível atribuir apenas no construtor.</span></li>
+</ul>
+<blockquote>
+<p><code>“We are now going to look at an immutable object. The Person object in the following code has three private member variables. The only time these can be set is during the creation time in the constructor. Once set, they are unable to be modified for the rest of the object's lifetime.” - Jason Alls</code></p>
+</blockquote>
+<ul>
+<li><span style="color:#ff7a8c;">O problema é que a propriedade <code>Errors</code> remove o encapsulamento, sendo possível adicionar ou remover elementos da lista (mas não atribuir outra), não seria melhor transformar a lista pro tipo <code>ReadOnlyCollection&lt;T&gt;</code>?</span></li>
+</ul>
+<blockquote>
+<p><code>“When you create an immutable type and use object validation, you have a valid object for the lifetime of that object. Immutable types are predictable and do not change, you are not going to be in for any nasty surprises. This makes immutable types ideal for sharing between threads as they are thread-safe and there is no need for defensive programming.” - Jason Alls</code></p>
+</blockquote>
+<ul>
+<li><span style="color:#8bc34a;">O atributo <code>[Serializable]</code> permite a serialização do objeto .</span></li>
+</ul>
+<h2 id="considerações-finais">Considerações finais</h2>
+<ul>
+<li>Permitir acessos aos dados apenas por métodos ou propriedades.</li>
+<li>Escrever objetos/estruturas imutáveis (readonly).</li>
+<li>Manter métodos com a menor quantidade de parâmetros possíveis (máximo 3).</li>
+<li>Métodos com muitos parâmetros podem ser substituidos por um objeto.</li>
+<li>Evitar código duplicado.</li>
+</ul>
+]]></content></item><item><title>Análise Open Source - Parte 1</title><link>https://rafaelmfonseca.github.io/posts/analise-open-source-parte-1/</link><pubDate>Tue, 21 Dec 2021 18:40:00 +0000</pubDate><guid>https://rafaelmfonseca.github.io/posts/analise-open-source-parte-1/</guid><description>No últimos dias estou tentando aprimorar minhas habilidades de engenharia de software para construir aplicações robustas, de fácil manutenção, baixo acoplamento e alta coesão.
+Pra isso, decidi analisar bibliotecas famosas para entender os pontos positivos e aplicá-las em meus softwares. Eu sei que cada projeto tem sua particularidade, mas análise de código também é algo importante para qualquer programador.
+Hoje vamos estudar o framework Entity Core, um ORM bem famoso no ambiente .</description><content type="html"><![CDATA[<p>No últimos dias estou tentando aprimorar minhas habilidades de engenharia de software para construir aplicações robustas, de fácil manutenção, baixo acoplamento e alta coesão.</p>
+<p>Pra isso, decidi analisar bibliotecas famosas para entender os pontos positivos e aplicá-las em meus softwares. Eu sei que cada projeto tem sua particularidade, mas análise de código também é algo importante para qualquer programador.</p>
+<p>Hoje vamos estudar o framework <a href="https://github.com/dotnet/efcore">Entity Core</a>, um ORM bem famoso no ambiente .NET.</p>
+<h2 id="dbcontextcs">DbContext.cs</h2>
+<p><code>DbContext</code> é a classe principal do EF e nela definimos vários <code>DbSet&lt;&gt;</code> para realizar operações de update/delete/create no banco de dados.</p>
+<p><code>src/EFCore/DbContext.cs</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="k">namespace</span> <span class="nn">Microsoft.EntityFrameworkCore</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">DbContext</span> <span class="p">:</span>
+    <span class="n">IInfrastructure</span><span class="p">&lt;</span><span class="n">IServiceProvider</span><span class="p">&gt;,</span>
+    <span class="n">IDbContextDependencies</span><span class="p">,</span>
+    <span class="n">IDbSetCache</span><span class="p">,</span>
+    <span class="n">IDbContextPoolable</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">DbContextOptions</span> <span class="m">_</span><span class="n">options</span><span class="p">;</span>
+
+    <span class="k">private</span> <span class="n">IDictionary</span><span class="p">&lt;(</span><span class="n">Type</span> <span class="n">Type</span><span class="p">,</span> <span class="kt">string?</span> <span class="n">Name</span><span class="p">),</span> <span class="kt">object</span><span class="p">&gt;?</span> <span class="m">_</span><span class="n">sets</span><span class="p">;</span>
+    <span class="k">private</span> <span class="n">IDbContextServices</span><span class="p">?</span> <span class="m">_</span><span class="n">contextServices</span><span class="p">;</span>
+    <span class="k">private</span> <span class="n">IDbContextDependencies</span><span class="p">?</span> <span class="m">_d</span><span class="n">bContextDependencies</span><span class="p">;</span>
+    <span class="k">private</span> <span class="n">DatabaseFacade</span><span class="p">?</span> <span class="m">_d</span><span class="n">atabase</span><span class="p">;</span>
+    <span class="k">private</span> <span class="n">ChangeTracker</span><span class="p">?</span> <span class="m">_</span><span class="n">changeTracker</span><span class="p">;</span>
+    
+    <span class="cm">/* ... */</span>
+
+    <span class="k">public</span> <span class="n">DbContext</span><span class="p">(</span><span class="n">DbContextOptions</span> <span class="n">options</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">Check</span><span class="p">.</span><span class="n">NotNull</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">nameof</span><span class="p">(</span><span class="n">options</span><span class="p">));</span>
+        <span class="cm">/* ... */</span>
+    <span class="p">}</span>
+
+    <span class="n">IDbSetSource</span> <span class="n">IDbContextDependencies</span><span class="p">.</span><span class="n">SetSource</span>
+        <span class="p">=&gt;</span> <span class="n">DbContextDependencies</span><span class="p">.</span><span class="n">SetSource</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">virtual</span> <span class="n">ChangeTracker</span> <span class="n">ChangeTracker</span> 
+        <span class="p">=&gt;</span> <span class="m">_</span><span class="n">changeTracker</span> <span class="p">??=</span> <span class="n">InternalServiceProvider</span><span class="p">.</span><span class="n">GetRequiredService</span><span class="p">&lt;</span><span class="n">IChangeTrackerFactory</span><span class="p">&gt;().</span><span class="n">Create</span><span class="p">();</span>
+
+    <span class="cm">/* ... */</span>
+
+    <span class="kt">object</span> <span class="n">IDbSetCache</span><span class="p">.</span><span class="n">GetOrAddSet</span><span class="p">(</span><span class="n">IDbSetSource</span> <span class="n">source</span><span class="p">,</span> <span class="n">Type</span> <span class="n">type</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+
+    <span class="cm">/* ... */</span>
+
+    <span class="kt">object</span> <span class="n">IDbSetCache</span><span class="p">.</span><span class="n">GetOrAddSet</span><span class="p">(</span><span class="n">IDbSetSource</span> <span class="n">source</span><span class="p">,</span> <span class="kt">string</span> <span class="n">entityTypeName</span><span class="p">,</span> <span class="n">Type</span> <span class="n">type</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+
+    <span class="cm">/* ... */</span>
+<span class="p">}</span>
+</code></pre></div><h2 id="analisando-dbcontextcs">Analisando DbContext.cs:</h2>
+<ul>
+<li><b>Princípio da Segregação de Interface:</b> A classe DbContext já trabalhou nesse princípio e dividiu suas interfaces em várias partes, cada uma com sua responsabilidade, e não ficou apenas em uma interface &ldquo;gorda&rdquo;.</li>
+<li>O namespace já foi declarado com a nova sintaxe do C# 10, fiz uma pesquisa rápida e no dia 21/Nov/2021 foi feito um <a href="https://github.com/dotnet/efcore/pull/26774">Pull Request</a> refatorando todos os namespaces do projeto.</li>
+<li>Todos os métodos (e até propriedades!) das interfaces, <a href="https://docs.microsoft.com/pt-br/dotnet/csharp/programming-guide/interfaces/explicit-interface-implementation">foram implementadas explicitamente!</a></li>
+<li>Propriedades declaradas em interfaces apenas como <code>{ get }</code> já estão sendo implementadas utilizando a nova sintaxe de lambda para propriedades read-only.</li>
+<li>Propriedades são declaradas com tipos estáticos como interfaces ou classes abstrata e futuramente são atribuídas com classes concretas que implementam essas interfaces ou herdam de classes abstratas.</li>
+</ul>
+<blockquote>
+<p>“An abstraction should not depend upon details, but details should depend upon abstractions. When you declare variables, you should always use static types such as an interface or abstract class. Concrete classes that implement the interface or inherit from the abstract class can then be assigned to the variable.” - Jason Alls</p>
+</blockquote>
+<ul>
+<li>Variáveis privadas começa com o prefixo &ldquo;_&rdquo;, seguindo as <a href="https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions">convenções de código da Microsoft</a>.</li>
+<li><code>_options</code> é marcado como <code>readonly</code> por ser atribuido apenas no construtor.</li>
+<li>Alguns métodos <code>private</code> não contém comentários, por quê?</li>
+<li>No construtor foi utilizado o método <code>Check.NotNull()</code> para verificar se o argumento <code>options</code> não é nulo, sem ele a biblioteca não funcionaria. Em primeiro momento, pensei que a classe <code>Check</code> era de terceiros, mas não, eles mesmos criaram essa classe estática que faz a verificação de vários valores.</li>
+</ul>
+<h2 id="checkcs">Check.cs:</h2>
+<p><code>src/Shared/Check.cs</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="k">namespace</span> <span class="nn">Microsoft.EntityFrameworkCore.Utilities</span><span class="p">;</span>
+
+<span class="k">internal</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">Check</span>
+<span class="p">{</span>
+    <span class="cm">/* ... */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="n">T</span> <span class="n">NotNull</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;(</span><span class="kt">string</span> <span class="n">parameterName</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+
+    <span class="cm">/* ... */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="n">IReadOnlyList</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;</span> <span class="n">NotEmpty</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;(</span><span class="kt">string</span> <span class="n">parameterName</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+
+    <span class="cm">/* ... */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="n">NotEmpty</span><span class="p">(</span><span class="kt">string?</span> <span class="k">value</span><span class="p">,</span> <span class="kt">string</span> <span class="n">parameterName</span><span class="p">)</span>
+    <span class="p">{</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h2 id="analisando-checkcs">Analisando Check.cs:</h2>
+<ul>
+<li>A classe foi organizada dentro do namespace <code>Utilities</code>. Pesquisei no Google e a biblioteca Azure SDK <a href="https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/mgmtcommon/Auth/Az.Auth/Az.Authentication/Utilities/Check.cs">fez algo parecido (até o nome do namespace é igual)!</a></li>
+<li>O arquivo da classe foi criada fora do EFCore, ela fica dentro da pasta &ldquo;Shared&rdquo;.</li>
+<li><b>Princípio da Responsabilidade Única:</b> a classe só tem um objetivo: verificar por valores nulos ou vazios.</li>
+<li>A classe é estática e não contém propriedades ou campos estáticos, o que evita memory leak, ponto positivo!</li>
+</ul>
+<blockquote>
+<p>“Any object that is referenced by a static variable is marked as not to be collected by the garbage collector. This is because static variables that reference objects are Garbage Collection (GC) roots, and anything that is a GC root is marked by the garbage collector as do not collect.” - Jason Alls</p>
+</blockquote>
+<ul>
+<li>Os métodos não têm comentários, ponto negativo.</li>
+<li>Linhas em branco importam para separar lógicas! Repare que fizeram commits apenas para inserir uma linha em branco antes do lançamento de uma exception.
+<img src="2021-12-21-19-43-00.png" alt="Minor formatting!"></li>
+</ul>
+<h2 id="dbsettentitycs">DbSet&lt;TEntity&gt;.cs</h2>
+<p><code>DbSet</code> é utilizado para criar consultas ou salvar instâncias de entidades que serão traduzidas para queries no banco de dados.</p>
+<p>Veja um exemplo de contexto, isso desperta minha curiosidade, como é feita a captura das propriedades do tipo DbSets&lt;&gt; na classe base DbContext?</p>
+<p><code>src/EFCore/DbSet.cs</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="k">public</span> <span class="k">class</span> <span class="nc">SampleContext</span> <span class="p">:</span> <span class="n">DbContext</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="n">DbSet</span><span class="p">&lt;</span><span class="n">Book</span><span class="p">&gt;</span> <span class="n">Books</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="n">DbSet</span><span class="p">&lt;</span><span class="n">Author</span><span class="p">&gt;</span> <span class="n">Authors</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h2 id="dbsetfinder">DbSetFinder</h2>
+<p>DbSetFinder, como o nome diz, é responsável por procurar propriedadades <code>DbSet&lt;TEntity&gt;</code> em classes que herdam de <code>DbContext.cs</code>.</p>
+<p>Pra isso, o pessoal do EFCore criou a interface <code>IDbSetFinder</code> e a classe <code>DbSetFinder</code> implementa essa interface.</p>
+<p><code>src/EFCore/Infrastructure/IDbSetFinder.cs</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="k">namespace</span> <span class="nn">Microsoft.EntityFrameworkCore.Infrastructure</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">interface</span> <span class="n">IDbSetFinder</span>
+<span class="p">{</span>
+    <span class="n">IReadOnlyList</span><span class="p">&lt;</span><span class="n">DbSetProperty</span><span class="p">&gt;</span> <span class="n">FindSets</span><span class="p">(</span><span class="n">Type</span> <span class="n">contextType</span><span class="p">);</span>
+<span class="p">}</span>
+
+</code></pre></div><p><code>src/EFCore/Infrastructure/Internal/DbSetFinder.cs</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="k">namespace</span> <span class="nn">Microsoft.EntityFrameworkCore.Infrastructure.Internal</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">DbSetFinder</span> <span class="p">:</span> <span class="n">IDbSetFinder</span>
+<span class="p">{</span>
+    <span class="cm">/* ... */</span>
+    <span class="k">public</span> <span class="k">virtual</span> <span class="n">IReadOnlyList</span><span class="p">&lt;</span><span class="n">DbSetProperty</span><span class="p">&gt;</span> <span class="n">FindSets</span><span class="p">(</span><span class="n">Type</span> <span class="n">contextType</span><span class="p">)</span>
+        <span class="p">=&gt;</span> <span class="m">_</span><span class="n">cache</span><span class="p">.</span><span class="n">GetOrAdd</span><span class="p">(</span><span class="n">contextType</span><span class="p">,</span> <span class="n">FindSetsNonCached</span><span class="p">);</span>
+
+    <span class="cm">/* ... */</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="n">DbSetProperty</span><span class="p">[]</span> <span class="n">FindSetsNonCached</span><span class="p">(</span><span class="n">Type</span> <span class="n">contextType</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="cm">/* ... */</span>
+        <span class="k">return</span> <span class="n">contextType</span><span class="p">.</span><span class="n">GetRuntimeProperties</span><span class="p">().</span><span class="cm">/* ... */</span><span class="p">.</span><span class="n">ToArray</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h2 id="analisando">Analisando</h2>
+<ul>
+<li>Os nomes são legíveis, compreensíveis para humanos e significativos em relação à intenção do código, mas curtos o suficiente para não irritar outros programadores.</li>
+<li><code>ConcurrentDictionary</code> é instânciado utilizando a nova expressão de invocação do construtor disponível na versão 9.0 do C#.</li>
+<li>Para capturar todas as propriedades, o EFCore faz uso de Reflection e LINQ.</li>
+</ul>
+<blockquote>
+<p>“The code should be checked to see whether the naming conventions have been followed for
+the various code constructs, such as classes, interfaces, member variables, local variables,
+enumerations, and methods. Nobody likes cryptic names that are hard to decipher,
+especially if the code base is large. As the reviewer, you must be able to read the code and understand it. If the code is difficult to read and understand, then it really needs to be refactored before being merged.” - Jason Alls</p>
+</blockquote>
+<h2 id="dbsetinitializer">DbSetInitializer</h2>
+<p>Ao invés do DbSetFinder ser chamado no DbContext, uma outra classe faz essa mediação: a <code>DbSetInitializer</code>.</p>
+<p><code>src\EFCore\Internal\IDbSetInitializer.cs</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="k">namespace</span> <span class="nn">Microsoft.EntityFrameworkCore.Internal</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">interface</span> <span class="n">IDbSetInitializer</span>
+<span class="p">{</span>
+    <span class="k">void</span> <span class="n">InitializeSets</span><span class="p">(</span><span class="n">DbContext</span> <span class="n">context</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div><p><code>src\EFCore\Internal\DbSetInitializer.cs</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="k">namespace</span> <span class="nn">Microsoft.EntityFrameworkCore.Internal</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">DbSetInitializer</span> <span class="p">:</span> <span class="n">IDbSetInitializer</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IDbSetFinder</span> <span class="m">_</span><span class="n">setFinder</span><span class="p">;</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IDbSetSource</span> <span class="m">_</span><span class="n">setSource</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="n">DbSetInitializer</span><span class="p">(</span>
+        <span class="n">IDbSetFinder</span> <span class="n">setFinder</span><span class="p">,</span>
+        <span class="n">IDbSetSource</span> <span class="n">setSource</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="m">_</span><span class="n">setFinder</span> <span class="p">=</span> <span class="n">setFinder</span><span class="p">;</span>
+        <span class="m">_</span><span class="n">setSource</span> <span class="p">=</span> <span class="n">setSource</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">virtual</span> <span class="k">void</span> <span class="n">InitializeSets</span><span class="p">(</span><span class="n">DbContext</span> <span class="n">context</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">setInfo</span> <span class="k">in</span> <span class="m">_</span><span class="n">setFinder</span><span class="p">.</span><span class="n">FindSets</span><span class="p">(</span><span class="n">context</span><span class="p">.</span><span class="n">GetType</span><span class="p">()).</span><span class="n">Where</span><span class="p">(</span><span class="n">p</span> <span class="p">=&gt;</span> <span class="n">p</span><span class="p">.</span><span class="n">Setter</span> <span class="p">!=</span> <span class="k">null</span><span class="p">))</span>
+        <span class="p">{</span>
+            <span class="cm">/** ... **/</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h2 id="analisando-1">Analisando</h2>
+<ul>
+<li><b>Lei de Demeter:</b> a classe não desobedece a lei de demeter, cada unidade de código tem um conhecimento limitado.</li>
+<li>Todos os campos são marcados como <code>readonly</code> por não serem atribuídos após a construtor.</li>
+</ul>
+<p><code>src\EFCore\DbContext.cs</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="k">namespace</span> <span class="nn">Microsoft.EntityFrameworkCore</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">DbContext</span> <span class="p">:</span>
+    <span class="n">IInfrastructure</span><span class="p">&lt;</span><span class="n">IServiceProvider</span><span class="p">&gt;,</span>
+    <span class="n">IDbContextDependencies</span><span class="p">,</span>
+    <span class="n">IDbSetCache</span><span class="p">,</span>
+    <span class="n">IDbContextPoolable</span>
+<span class="p">{</span>
+    <span class="cm">/** ... **/</span>
+    <span class="k">public</span> <span class="n">DbContext</span><span class="p">(</span><span class="n">DbContextOptions</span> <span class="n">options</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="cm">/** ... **/</span>
+
+        <span class="n">ServiceProviderCache</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="n">GetOrAdd</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">providerRequired</span><span class="p">:</span> <span class="k">false</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">GetRequiredService</span><span class="p">&lt;</span><span class="n">IDbSetInitializer</span><span class="p">&gt;()</span>
+            <span class="p">.</span><span class="n">InitializeSets</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+
+        <span class="cm">/** ... **/</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h2 id="considerações-finais">Considerações finais</h2>
+<ul>
+<li>Sempre referenciar interfaces ao invés de tipos concretos.</li>
+<li>Utilizar novas funcionalidades da linguagem para facilitar leitura e manter o código sempre atualizado.</li>
+<li>Escrever classes com apenas uma responsabilidade.</li>
+<li>Evitar métodos grandes e com mais de 10 linhas.</li>
+</ul>
+<blockquote>
+<p>“Large methods are not nice to read and understand. They can also lead to very hard-to-find bugs. Another problem with large methods is they can lose sight of their original intent. It&rsquo;s even worse when you come across large methods that have sections separated by comments and code wrapped in regions.” - Jason Alls</p>
+</blockquote>
+<ul>
+<li>Ah! Reconheci o uso de Fluent interface em vários pontos da biblioteca, e utilizar esse design pattern não inflige a lei de demeter (Ex: <code>src\EFCore\ModelBuilder.cs</code>).</li>
+</ul>
+]]></content></item><item><title>Criando um website com Hugo no GitHub Pages e GitHub Actions.</title><link>https://rafaelmfonseca.github.io/posts/criando-website-hugo-github-pages-github-actions/</link><pubDate>Mon, 20 Dec 2021 21:30:50 -0300</pubDate><guid>https://rafaelmfonseca.github.io/posts/criando-website-hugo-github-pages-github-actions/</guid><description>Hoje decidi criar um blog, mais uma de minhas loucuras (quem diria?).
+Eu resolvo diferentes problemas relacionados à programação no meu dia-a-dia, então decidi criar este blog para expor as dificuldades que tive para chegar em um resultado positivo para esses obstáculos.
+Gostaria de mencionar que escrever nunca foi meu forte, eu passo o meu dia apenas digitando palavras-chaves (ou quem sabe um JSDoc?), mas vou tentar escrever os posts de uma maneira fácil para que todos entendam.</description><content type="html"><![CDATA[<p><br><br>
+Hoje decidi criar um blog, mais uma de minhas loucuras (quem diria?).</p>
+<p>Eu resolvo diferentes problemas relacionados à programação no meu dia-a-dia, então decidi criar este blog para expor as dificuldades que tive para chegar em um resultado positivo para esses obstáculos.</p>
+<p>Gostaria de mencionar que escrever nunca foi meu forte, eu passo o meu dia apenas digitando palavras-chaves (ou quem sabe um JSDoc?), mas vou tentar escrever os posts de uma maneira fácil para que todos entendam.</p>
+<h2 id="enfim-vamos-ao-que-importa-como-criei-esse-blog">Enfim, vamos ao que importa, como criei esse blog?</h2>
+<p>Aparentemente, no ambiente do <a href="https://go.dev/">Go Language</a> existe um framework muito famoso chamado <code>Hugo</code> (nome de gente? vou criar o <code>Rafael</code>), e ele é bastante utilizado para criação de websites estáticos.</p>
+<h2 id="1-passo-instalar-o-golang-e-hugo-framework">1° Passo: Instalar o GoLang e Hugo Framework</h2>
+<ul>
+<li>Você pode baixar o GoLang direto do site: <a href="https://go.dev/">https://go.dev/</a></li>
+<li>Instalar o <code>Hugo</code> é um pouco mais complicado porque seu executável precisa estar em uma pasta definida nas suas variáveis de ambiente, então simplesmente joguei na pasta do GoLang:</li>
+</ul>
+<p><img src="2021-12-21-00-55-59.png" alt="Go"></p>
+<p>Verifique se está tudo ok:</p>
+<p><img src="2021-12-21-00-58-57.png" alt="Hyper Command Line"></p>
+<h2 id="2-passo-criação-dos-repositórios">2° Passo: Criação dos repositórios</h2>
+<p>Dividi o projeto em dois repositórios no GitHub: o back-end e o front-end.</p>
+<p>Back-end: <code>RafaelMFonseca/rafaelmfonseca.blog</code></p>
+<p>Front-end: <code>RafaelMFonseca/rafaelmfonseca.github.io</code></p>
+<p>Antes de tudo iniciei o repositório do back-end com CLI do hugo:</p>
+<pre tabindex="0"><code>$ hugo new site rafaelmfonseca.blog
+$ cd rafaelmfonseca.blog
+$ git init
+$ git submodule add https://github.com/nanxiaobei/hugo-paper themes/paper
+$ hugo server
+$ git submodule add -b main git@github.com:RafaelMFonseca/rafaelmfonseca.github.io public
+</code></pre><p><img src="2021-12-21-01-16-13.png" alt="RafaelMFonseca/rafaelmfonseca.blog"></p>
+<p>Observe que adicionei dois submódulos do git, o primeiro sendo o tema principal: <code>nanxiaobei/hugo-paper</code> (pasta themes), e segundo o módulo onde os arquivos compilados serão jogados: <code>RafaelMFonseca/rafaelmfonseca.github.io</code> (pasta public).</p>
+<h2 id="3-passo-configuração-do-blog">3° Passo: Configuração do blog</h2>
+<p>Abra o arquivo <code>config.toml</code> e altere as propriedades de acordo com o tema selecionado.
+Veja o meu de exemplo:</p>
+<pre tabindex="0"><code>baseURL = 'https://rafaelmfonseca.github.io/'
+languageCode = 'en-us'
+title = 'Rafael Moreira Fonseca'
+theme = 'paper'
+</code></pre><h2 id="4-passo-breve-resumo-do-hugo-cli">4° Passo: Breve resumo do Hugo CLI</h2>
+<p>Provavalmente você não vai utilizar os comandos abaixo se configurar para realizar build automática pelo GitHub Actions, mas só por curiosidade:</p>
+<p>Para compilar o arquivos:</p>
+<pre tabindex="0"><code>$ hugo
+</code></pre><p>Para iniciar o servidor de dev:</p>
+<pre tabindex="0"><code>$ hugo server
+</code></pre><h2 id="5-passo-build-automática-pelo-github-actions">5° Passo: Build automática pelo GitHub Actions</h2>
+<p>Vamos utilizar o GitHub Pages justamente para hospedar uma aplicação compilada com o <code>Hugo</code> e o GitHub Actions para automatizar sua build.</p>
+<p>O workflow vai ser mais ou menos isso:</p>
+<p><b> Commit na branch <code>RafaelMFonseca/rafaelmfonseca.blog</code> =&gt; GitHub Actions =&gt; Branch <code>RafaelMFonseca/rafaelmfonseca.github.io</code> atualizada com os arquivos estáticos do blog</b></p>
+<p>Crie em seu repositório do back-end o seguinte arquivo: <code>.github/workflows/main.yml</code> com o conteúdo:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">CI</span><span class="w">
+</span><span class="w"></span><span class="nt">on</span><span class="p">:</span><span class="w"> </span><span class="l">push</span><span class="w">
+</span><span class="w"></span><span class="nt">jobs</span><span class="p">:</span><span class="w">
+</span><span class="w">  </span><span class="nt">deploy</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l">ubuntu-latest</span><span class="w">
+</span><span class="w">    </span><span class="nt">steps</span><span class="p">:</span><span class="w">
+</span><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Git checkout</span><span class="w">
+</span><span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l">actions/checkout@v2</span><span class="w">
+</span><span class="w">        </span><span class="nt">with</span><span class="p">:</span><span class="w">
+</span><span class="w">            </span><span class="nt">ssh-key</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.SSH_PRIVATE_KEY }}</span><span class="w">
+</span><span class="w">            </span><span class="nt">persist-credentials</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span><span class="w">            </span><span class="nt">submodules</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span><span class="w">
+</span><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Update theme</span><span class="w">
+</span><span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l">snickerbockers/submodules-init@v4</span><span class="w">
+</span><span class="w">
+</span><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Setup hugo</span><span class="w">
+</span><span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l">peaceiris/actions-hugo@v2</span><span class="w">
+</span><span class="w">        </span><span class="nt">with</span><span class="p">:</span><span class="w">
+</span><span class="w">            </span><span class="nt">hugo-version</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;0.85.0&#34;</span><span class="w">
+</span><span class="w">
+</span><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Build</span><span class="w">
+</span><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l">hugo --minify</span><span class="w">
+</span><span class="w">
+</span><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">Deploy</span><span class="w">
+</span><span class="w">        </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l">peaceiris/actions-gh-pages@v3</span><span class="w">
+</span><span class="w">        </span><span class="nt">with</span><span class="p">:</span><span class="w">
+</span><span class="w">            </span><span class="nt">personal_token</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.TOKEN }}</span><span class="w">
+</span><span class="w">            </span><span class="nt">external_repository</span><span class="p">:</span><span class="w"> </span><span class="l">&lt;nomeusuario&gt;/&lt;nomeusuario&gt;.github.io</span><span class="w">
+</span><span class="w">            </span><span class="nt">publish_dir</span><span class="p">:</span><span class="w"> </span><span class="l">./public</span><span class="w">
+</span><span class="w">            </span><span class="nt">keep_files</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+</span><span class="w">            </span><span class="nt">user_name</span><span class="p">:</span><span class="w"> </span><span class="l">&lt;nomeusuario&gt;</span><span class="w">
+</span><span class="w">            </span><span class="nt">user_email</span><span class="p">:</span><span class="w"> </span><span class="l">&lt;emailvalido&gt;</span><span class="w">
+</span><span class="w">            </span><span class="nt">publish_branch</span><span class="p">:</span><span class="w"> </span><span class="l">main</span><span class="w">
+</span><span class="w">            </span><span class="nt">force_orphan</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></code></pre></div><h2 id="6-passo-configurações-de-token">6° Passo: Configurações de token</h2>
+<p>Note que no YAML estamos utilizando duas variáveis: SSH_PRIVATE_KEY e TOKEN.</p>
+<p>O TOKEN é gerado pelo link: <a href="https://github.com/settings/tokens/new">https://github.com/settings/tokens/new</a></p>
+<p><img src="2021-12-21-01-20-45.png" alt="Access token"></p>
+<p>E para declarar essas variáveis adicionamos em: <a href="https://github.com/nomeusuario/seurepositorio/settings/secrets/actions">https://github.com/nomeusuario/seurepositorio/settings/secrets/actions</a></p>
+<p><img src="2021-12-21-01-22-17.png" alt="Actions secret"></p>
+<p>O SSH_PRIVATE_KEY é sua chave SSH gerada para o GitHub.</p>
+<p>Com isso qualquer commit vai disparar o GitHub Actions e publicar seu blog no repositório de front-end.</p>
+]]></content></item></channel></rss>

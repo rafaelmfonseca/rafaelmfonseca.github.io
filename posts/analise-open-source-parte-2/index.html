@@ -1,0 +1,216 @@
+<!doctype html><html lang=en-us>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="ie=edge">
+<meta name=theme-color content="#494f5c">
+<meta name=msapplication-TileColor content="#494f5c">
+<meta itemprop=name content="Análise Open Source - Parte 2">
+<meta itemprop=description content="Hoje é dia de estudar o projeto FluentValidation/FluentValidation, uma biblioteca simples se comparada com o EFCore, mas acredito que a vamos conseguir extrair alguns padrões interessantes com seu código.
+AbstractValidator.cs AbstractValidator é a classe abstrata principal que declara as validações de um determinado model/entity.
+src/FluentValidation/AbstractValidator.cs
+#region License // Copyright (c) .NET Foundation and contributors. // ... #endregion namespace FluentValidation { using System; using System.Collections.Generic; /** ... **/ public abstract class AbstractValidator<T> : IValidator<T>, IEnumerable<IValidationRule> { /** ."><meta itemprop=datePublished content="2021-12-23T22:08:00+00:00">
+<meta itemprop=dateModified content="2021-12-23T22:08:00+00:00">
+<meta itemprop=wordCount content="638">
+<meta itemprop=keywords content="OpenSource,GitHub,C#,SOLID,DesignPatterns,"><meta property="og:title" content="Análise Open Source - Parte 2">
+<meta property="og:description" content="Hoje é dia de estudar o projeto FluentValidation/FluentValidation, uma biblioteca simples se comparada com o EFCore, mas acredito que a vamos conseguir extrair alguns padrões interessantes com seu código.
+AbstractValidator.cs AbstractValidator é a classe abstrata principal que declara as validações de um determinado model/entity.
+src/FluentValidation/AbstractValidator.cs
+#region License // Copyright (c) .NET Foundation and contributors. // ... #endregion namespace FluentValidation { using System; using System.Collections.Generic; /** ... **/ public abstract class AbstractValidator<T> : IValidator<T>, IEnumerable<IValidationRule> { /** .">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://rafaelmfonseca.github.io/posts/analise-open-source-parte-2/"><meta property="article:section" content="posts">
+<meta property="article:published_time" content="2021-12-23T22:08:00+00:00">
+<meta property="article:modified_time" content="2021-12-23T22:08:00+00:00">
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="Análise Open Source - Parte 2">
+<meta name=twitter:description content="Hoje é dia de estudar o projeto FluentValidation/FluentValidation, uma biblioteca simples se comparada com o EFCore, mas acredito que a vamos conseguir extrair alguns padrões interessantes com seu código.
+AbstractValidator.cs AbstractValidator é a classe abstrata principal que declara as validações de um determinado model/entity.
+src/FluentValidation/AbstractValidator.cs
+#region License // Copyright (c) .NET Foundation and contributors. // ... #endregion namespace FluentValidation { using System; using System.Collections.Generic; /** ... **/ public abstract class AbstractValidator<T> : IValidator<T>, IEnumerable<IValidationRule> { /** .">
+<link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png>
+<link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png>
+<link rel=manifest href=/site.webmanifest>
+<link rel=mask-icon href=/safari-pinned-tab.svg color>
+<link rel="shortcut icon" href=/favicon.ico>
+<title>Análise Open Source - Parte 2</title>
+<link rel=stylesheet href=https://rafaelmfonseca.github.io/css/style.min.eac77496566fd7d5768fd650ddb0b2b181ca6a2d7c5fdd6fe6b8ba4bf47e566f.css integrity="sha256-6sd0llZv19V2j9ZQ3bCysYHKai18X91v5ri6S/R+Vm8=" crossorigin=anonymous>
+<link rel=stylesheet href=https://rafaelmfonseca.github.io/css/disqusfix.css>
+</head>
+<body id=page>
+<header id=site-header class="animated slideInUp">
+<div class="hdr-wrapper section-inner">
+<div class=hdr-left>
+<div class=site-branding>
+<a href=https://rafaelmfonseca.github.io/>Rafael Moreira Fonseca</a>
+</div>
+<nav class="site-nav hide-in-mobile">
+<a href=https://rafaelmfonseca.github.io/posts/>Posts</a>
+</nav>
+</div>
+<div class="hdr-right hdr-icons">
+<span class="hdr-social hide-in-mobile"><a href=https://github.com/RafaelMFonseca target=_blank rel="noopener me" title=Github><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37.0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44.0 0020 4.77 5.07 5.07.0 0019.91 1S18.73.65 16 2.48a13.38 13.38.0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07.0 005 4.77 5.44 5.44.0 003.5 8.55c0 5.42 3.3 6.61 6.44 7A3.37 3.37.0 009 18.13V22"/></svg></a><a href=https://www.linkedin.com/in/rafael-moreira-fonseca/ target=_blank rel="noopener me" title=Linkedin><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a></span><button id=menu-btn class=hdr-btn title=Menu><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+</div>
+</div>
+</header>
+<div id=mobile-menu class="animated fast">
+<ul>
+<li><a href=https://rafaelmfonseca.github.io/posts/>Posts</a></li>
+</ul>
+</div>
+<main class="site-main section-inner animated fadeIn faster">
+<article class=thin>
+<header class=post-header>
+<div class=post-meta><span>Dec 23, 2021</span></div>
+<h1>Análise Open Source - Parte 2</h1>
+</header>
+<div class=content>
+<p>Hoje é dia de estudar o projeto <a href=https://github.com/FluentValidation/FluentValidation>FluentValidation/FluentValidation</a>, uma biblioteca simples se comparada com o EFCore, mas acredito que a vamos conseguir extrair alguns padrões interessantes com seu código.</p>
+<h2 id=abstractvalidatorcs>AbstractValidator.cs<a href=#abstractvalidatorcs class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p><code>AbstractValidator</code> é a classe abstrata principal que declara as validações de um determinado model/entity.</p>
+<p><code>src/FluentValidation/AbstractValidator.cs</code></p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-csharp data-lang=csharp><span class=cp>#region License
+</span><span class=cp></span><span class=c1>// Copyright (c) .NET Foundation and contributors.
+</span><span class=c1>// ...
+</span><span class=c1></span><span class=cp>#endregion
+</span><span class=cp></span><span class=k>namespace</span> <span class=nn>FluentValidation</span> <span class=p>{</span>
+	<span class=k>using</span> <span class=nn>System</span><span class=p>;</span>
+	<span class=k>using</span> <span class=nn>System.Collections.Generic</span><span class=p>;</span>
+    <span class=cm>/** ... **/</span>
+
+    <span class=k>public</span> <span class=k>abstract</span> <span class=k>class</span> <span class=nc>AbstractValidator</span><span class=p>&lt;</span><span class=n>T</span><span class=p>&gt;</span> <span class=p>:</span> <span class=n>IValidator</span><span class=p>&lt;</span><span class=n>T</span><span class=p>&gt;,</span> <span class=n>IEnumerable</span><span class=p>&lt;</span><span class=n>IValidationRule</span><span class=p>&gt;</span> <span class=p>{</span>
+        <span class=cm>/** ... **/</span>
+        <span class=k>internal</span> <span class=n>TrackingCollection</span><span class=p>&lt;</span><span class=n>IValidationRuleInternal</span><span class=p>&lt;</span><span class=n>T</span><span class=p>&gt;&gt;</span> <span class=n>Rules</span> <span class=p>{</span> <span class=k>get</span><span class=p>;</span> <span class=p>}</span> <span class=p>=</span> <span class=k>new</span><span class=p>();</span>
+
+        <span class=cm>/** .. **/</span>
+        <span class=n>ValidationResult</span> <span class=n>IValidator</span><span class=p>.</span><span class=n>Validate</span><span class=p>(</span><span class=n>IValidationContext</span> <span class=n>context</span><span class=p>)</span> <span class=p>{</span>
+			<span class=n>context</span><span class=p>.</span><span class=n>Guard</span><span class=p>(</span><span class=s>&#34;Cannot pass null to Validate&#34;</span><span class=p>,</span> <span class=n>nameof</span><span class=p>(</span><span class=n>context</span><span class=p>));</span>
+			<span class=k>return</span> <span class=n>Validate</span><span class=p>(</span><span class=n>ValidationContext</span><span class=p>&lt;</span><span class=n>T</span><span class=p>&gt;.</span><span class=n>GetFromNonGenericContext</span><span class=p>(</span><span class=n>context</span><span class=p>));</span>
+		<span class=p>}</span>
+
+        <span class=cm>/** .. **/</span>
+        <span class=k>public</span> <span class=n>IEnumerator</span><span class=p>&lt;</span><span class=n>IValidationRule</span><span class=p>&gt;</span> <span class=n>GetEnumerator</span><span class=p>()</span> <span class=p>{</span>
+            <span class=k>return</span> <span class=n>Rules</span><span class=p>.</span><span class=n>GetEnumerator</span><span class=p>();</span>
+        <span class=p>}</span>
+
+        <span class=n>IEnumerator</span> <span class=n>IEnumerable</span><span class=p>.</span><span class=n>GetEnumerator</span><span class=p>()</span> <span class=p>{</span>
+            <span class=k>return</span> <span class=n>GetEnumerator</span><span class=p>();</span>
+        <span class=p>}</span>
+    <span class=p>}</span>
+<span class=p>}</span>
+</code></pre></div><h2 id=analisando-abstractvalidatorcs>Analisando AbstractValidator.cs:<a href=#analisando-abstractvalidatorcs class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<ul>
+<li><span style=color:#8bc34a>O arquivo começa com um avisos de direitos autorais.</span></li>
+</ul>
+<blockquote>
+<p><code>“It is always a good idea to include copyright notices at the top of each source code file and to comment on your namespaces, interfaces, classes, enums, structs, methods, and properties. Your copyright comments should be first in the source file, above the using statements and take the form of a multiline comment that starts with /* and ends with */.” - Jason Alls</code></p>
+</blockquote>
+<ul>
+<li>
+<p><span style=color:#ff7a8c>Aqui é utilizado a antiga declaração de namespace, e as instruções de using estão dentro do namespace, estranho né?</span></p>
+</li>
+<li>
+<p><span style=color:#8bc34a>O método <code>IValidator.Validate(context)</code> retorna um <code>ValidationResult</code>.</span></p>
+</li>
+<li>
+<p><span style=color:#8bc34a>A classe implementa <code>IValidator&lt;in T></code> e <code>IEnumerable</code> explicitamente(mas também implicitamente). EF Core fez o mesmo, aparentemente isso está se tornando um padrão, força o usuário a não declarar variáveis de tipos concretos(classes).</span></p>
+</li>
+<li>
+<p><span style=color:#8bc34a><code>IValidator&lt;in T></code>(a versão genérica) permite utilizar interfaces em injeções de dependência. A interface <code>IValidator</code> (não genérica) existe também.</span></p>
+</li>
+</ul>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-csharp data-lang=csharp><span class=k>public</span> <span class=k>class</span> <span class=nc>Startup</span>
+<span class=p>{</span>
+    <span class=cm>/** ... **/</span>
+    <span class=k>public</span> <span class=k>void</span> <span class=n>ConfigureServices</span><span class=p>(</span><span class=n>IServiceCollection</span> <span class=n>services</span><span class=p>)</span>
+    <span class=p>{</span>
+        <span class=cm>/** ... **/</span>
+        <span class=n>services</span><span class=p>.</span><span class=n>AddScoped</span><span class=p>&lt;</span><span class=n>IValidator</span><span class=p>&lt;</span><span class=n>User</span><span class=p>&gt;,</span> <span class=n>UserValidator</span><span class=p>&gt;();</span>
+    <span class=p>}</span>
+<span class=p>}</span>
+</code></pre></div><ul>
+<li><span style=color:#8bc34a><code>AbstractValidator&lt;T></code> é uma classe abstrata, portanto não pode ser instânciada. No EF Core a classe de inicialização é a <code>DbContext.cs</code>, no entanto não é abstrata.</span></li>
+</ul>
+<blockquote>
+<p><code>Typically you create a class that derives from DbContext and contains DbSet&lt;TEntity> properties for each entity in the model. (EF Core)</code></p>
+</blockquote>
+<ul>
+<li><span style=color:#8bc34a><code>TrackingCollection</code> é instânciado utilizando a nova sintaxe <code>new()</code>.</span></li>
+</ul>
+<p><img src=2021-12-23-22-56-52.png alt></p>
+<ul>
+<li><span style=color:#8bc34a>A verificação por parâmetros nulos ou vazios é feita pelo método de extensão <code>ExtensionsInternal.Guard(this object obj, string message, string paramName)</code> (parecido com o <code>Check.NotNull()</code> do EF Core). Os métodos da classe <code>ExtensionsInternal</code> são <code>internal</code>, só podem ser utilizadas dentro da mesma assembly/dll.</span></li>
+</ul>
+<h2 id=validationresultcs>ValidationResult.cs<a href=#validationresultcs class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p><code>ValidationResult</code> é a classe que representa o resultado de uma validação.</p>
+<p><code>src/FluentValidation/ValidationResult.cs</code></p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-csharp data-lang=csharp><span class=na>[Serializable]</span>
+<span class=k>public</span> <span class=k>class</span> <span class=nc>ValidationResult</span> <span class=p>{</span>
+    <span class=k>private</span> <span class=k>readonly</span> <span class=n>List</span><span class=p>&lt;</span><span class=n>ValidationFailure</span><span class=p>&gt;</span> <span class=m>_</span><span class=n>errors</span><span class=p>;</span>
+
+    <span class=cm>/** ... **/</span>
+    <span class=k>public</span> <span class=n>List</span><span class=p>&lt;</span><span class=n>ValidationFailure</span><span class=p>&gt;</span> <span class=n>Errors</span> <span class=p>=&gt;</span> <span class=m>_</span><span class=n>errors</span><span class=p>;</span>
+
+    <span class=cm>/** ... **/</span>
+    <span class=k>public</span> <span class=n>ValidationResult</span><span class=p>()</span> <span class=p>{</span>
+        <span class=m>_</span><span class=n>errors</span> <span class=p>=</span> <span class=k>new</span> <span class=n>List</span><span class=p>&lt;</span><span class=n>ValidationFailure</span><span class=p>&gt;();</span>
+    <span class=p>}</span>
+<span class=p>}</span>
+</code></pre></div><h2 id=analisando-validationresultcs>Analisando ValidationResult.cs:<a href=#analisando-validationresultcs class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<ul>
+<li><span style=color:#8bc34a>O campo <code>_errors</code> é readonly, sendo possível atribuir apenas no construtor.</span></li>
+</ul>
+<blockquote>
+<p><code>“We are now going to look at an immutable object. The Person object in the following code has three private member variables. The only time these can be set is during the creation time in the constructor. Once set, they are unable to be modified for the rest of the object's lifetime.” - Jason Alls</code></p>
+</blockquote>
+<ul>
+<li><span style=color:#ff7a8c>O problema é que a propriedade <code>Errors</code> remove o encapsulamento, sendo possível adicionar ou remover elementos da lista (mas não atribuir outra), não seria melhor transformar a lista pro tipo <code>ReadOnlyCollection&lt;T></code>?</span></li>
+</ul>
+<blockquote>
+<p><code>“When you create an immutable type and use object validation, you have a valid object for the lifetime of that object. Immutable types are predictable and do not change, you are not going to be in for any nasty surprises. This makes immutable types ideal for sharing between threads as they are thread-safe and there is no need for defensive programming.” - Jason Alls</code></p>
+</blockquote>
+<ul>
+<li><span style=color:#8bc34a>O atributo <code>[Serializable]</code> permite a serialização do objeto .</span></li>
+</ul>
+<h2 id=considerações-finais>Considerações finais<a href=#considerações-finais class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<ul>
+<li>Permitir acessos aos dados apenas por métodos ou propriedades.</li>
+<li>Escrever objetos/estruturas imutáveis (readonly).</li>
+<li>Manter métodos com a menor quantidade de parâmetros possíveis (máximo 3).</li>
+<li>Métodos com muitos parâmetros podem ser substituidos por um objeto.</li>
+<li>Evitar código duplicado.</li>
+</ul>
+</div>
+<hr class=post-end>
+<footer class=post-info>
+<p>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83.0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7" y2="7"/></svg><span class=tag><a href=https://rafaelmfonseca.github.io/tags/opensource>OpenSource</a></span><span class=tag><a href=https://rafaelmfonseca.github.io/tags/github>GitHub</a></span><span class=tag><a href=https://rafaelmfonseca.github.io/tags/c>C#</a></span><span class=tag><a href=https://rafaelmfonseca.github.io/tags/solid>SOLID</a></span><span class=tag><a href=https://rafaelmfonseca.github.io/tags/designpatterns>DesignPatterns</a></span>
+</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>638 Words</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>23-12-2021 22:08 +0000</p>
+</footer>
+</article>
+<div class="post-nav thin">
+<a class=next-post href=https://rafaelmfonseca.github.io/posts/design-pattern-expor-versao-nao-generica-interfaces-generica/>
+<span class=post-nav-label><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>&nbsp;Newer</span><br><span>Design Pattern: Expor versão não genérica de interfaces genéricas</span>
+</a>
+<a class=prev-post href=https://rafaelmfonseca.github.io/posts/analise-open-source-parte-1/>
+<span class=post-nav-label>Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span><br><span>Análise Open Source - Parte 1</span>
+</a>
+</div>
+<div id=comments class=thin>
+<div id=disqus_thread></div>
+<script type=application/javascript>var disqus_config=function(){};(function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById('disqus_thread').innerHTML='Disqus comments not available by default when the website is previewed locally.';return}var b=document,a=b.createElement('script');a.async=!0,a.src='//rafaelmfonseca.disqus.com/embed.js',a.setAttribute('data-timestamp',+new Date),(b.head||b.body).appendChild(a)})()</script>
+<noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript>
+<a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a>
+</div>
+</main>
+<footer id=site-footer class="section-inner thin animated fadeIn faster">
+<p>&copy; 2022 <a href=https://rafaelmfonseca.github.io/>Rafael Moreira Fonseca</a>&#183; <a href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank rel=noopener>CC BY-NC 4.0</a></p>
+<p>
+Made with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> &#183; Theme <a href=https://github.com/Track3/hermit target=_blank rel=noopener>Hermit</a> &#183; <a href=https://rafaelmfonseca.github.io/posts/index.xml target=_blank title=rss><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 019 9"/><path d="M4 4a16 16 0 0116 16"/><circle cx="5" cy="19" r="1"/></svg></a>
+</p>
+</footer>
+<script src=https://rafaelmfonseca.github.io/js/bundle.min.7d8545daa55d62427355498dd8da13f98ff79a7938ce7d2a5e2ae1ec0de3beb8.js integrity="sha256-fYVF2qVdYkJzVUmN2NoT+Y/3mnk4zn0qXirh7A3jvrg=" crossorigin=anonymous></script>
+</body>
+</html>

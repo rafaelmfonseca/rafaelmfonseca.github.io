@@ -1,0 +1,312 @@
+<!doctype html><html lang=en-us>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="ie=edge">
+<meta name=theme-color content="#494f5c">
+<meta name=msapplication-TileColor content="#494f5c">
+<meta itemprop=name content="Análise Open Source - Parte 1">
+<meta itemprop=description content="No últimos dias estou tentando aprimorar minhas habilidades de engenharia de software para construir aplicações robustas, de fácil manutenção, baixo acoplamento e alta coesão.
+Pra isso, decidi analisar bibliotecas famosas para entender os pontos positivos e aplicá-las em meus softwares. Eu sei que cada projeto tem sua particularidade, mas análise de código também é algo importante para qualquer programador.
+Hoje vamos estudar o framework Entity Core, um ORM bem famoso no ambiente ."><meta itemprop=datePublished content="2021-12-21T18:40:00+00:00">
+<meta itemprop=dateModified content="2021-12-21T18:40:00+00:00">
+<meta itemprop=wordCount content="1194">
+<meta itemprop=keywords content="OpenSource,GitHub,C#,SOLID,DesignPatterns,"><meta property="og:title" content="Análise Open Source - Parte 1">
+<meta property="og:description" content="No últimos dias estou tentando aprimorar minhas habilidades de engenharia de software para construir aplicações robustas, de fácil manutenção, baixo acoplamento e alta coesão.
+Pra isso, decidi analisar bibliotecas famosas para entender os pontos positivos e aplicá-las em meus softwares. Eu sei que cada projeto tem sua particularidade, mas análise de código também é algo importante para qualquer programador.
+Hoje vamos estudar o framework Entity Core, um ORM bem famoso no ambiente .">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://rafaelmfonseca.github.io/posts/analise-open-source-parte-1/"><meta property="article:section" content="posts">
+<meta property="article:published_time" content="2021-12-21T18:40:00+00:00">
+<meta property="article:modified_time" content="2021-12-21T18:40:00+00:00">
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="Análise Open Source - Parte 1">
+<meta name=twitter:description content="No últimos dias estou tentando aprimorar minhas habilidades de engenharia de software para construir aplicações robustas, de fácil manutenção, baixo acoplamento e alta coesão.
+Pra isso, decidi analisar bibliotecas famosas para entender os pontos positivos e aplicá-las em meus softwares. Eu sei que cada projeto tem sua particularidade, mas análise de código também é algo importante para qualquer programador.
+Hoje vamos estudar o framework Entity Core, um ORM bem famoso no ambiente .">
+<link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png>
+<link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png>
+<link rel=manifest href=/site.webmanifest>
+<link rel=mask-icon href=/safari-pinned-tab.svg color>
+<link rel="shortcut icon" href=/favicon.ico>
+<title>Análise Open Source - Parte 1</title>
+<link rel=stylesheet href=https://rafaelmfonseca.github.io/css/style.min.eac77496566fd7d5768fd650ddb0b2b181ca6a2d7c5fdd6fe6b8ba4bf47e566f.css integrity="sha256-6sd0llZv19V2j9ZQ3bCysYHKai18X91v5ri6S/R+Vm8=" crossorigin=anonymous>
+<link rel=stylesheet href=https://rafaelmfonseca.github.io/css/disqusfix.css>
+</head>
+<body id=page>
+<header id=site-header class="animated slideInUp">
+<div class="hdr-wrapper section-inner">
+<div class=hdr-left>
+<div class=site-branding>
+<a href=https://rafaelmfonseca.github.io/>Rafael Moreira Fonseca</a>
+</div>
+<nav class="site-nav hide-in-mobile">
+<a href=https://rafaelmfonseca.github.io/posts/>Posts</a>
+</nav>
+</div>
+<div class="hdr-right hdr-icons">
+<span class="hdr-social hide-in-mobile"><a href=https://github.com/RafaelMFonseca target=_blank rel="noopener me" title=Github><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37.0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44.0 0020 4.77 5.07 5.07.0 0019.91 1S18.73.65 16 2.48a13.38 13.38.0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07.0 005 4.77 5.44 5.44.0 003.5 8.55c0 5.42 3.3 6.61 6.44 7A3.37 3.37.0 009 18.13V22"/></svg></a><a href=https://www.linkedin.com/in/rafael-moreira-fonseca/ target=_blank rel="noopener me" title=Linkedin><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a></span><button id=menu-btn class=hdr-btn title=Menu><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+</div>
+</div>
+</header>
+<div id=mobile-menu class="animated fast">
+<ul>
+<li><a href=https://rafaelmfonseca.github.io/posts/>Posts</a></li>
+</ul>
+</div>
+<main class="site-main section-inner animated fadeIn faster">
+<article class=thin>
+<header class=post-header>
+<div class=post-meta><span>Dec 21, 2021</span></div>
+<h1>Análise Open Source - Parte 1</h1>
+</header>
+<div class=content>
+<p>No últimos dias estou tentando aprimorar minhas habilidades de engenharia de software para construir aplicações robustas, de fácil manutenção, baixo acoplamento e alta coesão.</p>
+<p>Pra isso, decidi analisar bibliotecas famosas para entender os pontos positivos e aplicá-las em meus softwares. Eu sei que cada projeto tem sua particularidade, mas análise de código também é algo importante para qualquer programador.</p>
+<p>Hoje vamos estudar o framework <a href=https://github.com/dotnet/efcore>Entity Core</a>, um ORM bem famoso no ambiente .NET.</p>
+<h2 id=dbcontextcs>DbContext.cs<a href=#dbcontextcs class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p><code>DbContext</code> é a classe principal do EF e nela definimos vários <code>DbSet&lt;></code> para realizar operações de update/delete/create no banco de dados.</p>
+<p><code>src/EFCore/DbContext.cs</code></p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-csharp data-lang=csharp><span class=k>namespace</span> <span class=nn>Microsoft.EntityFrameworkCore</span><span class=p>;</span>
+
+<span class=k>public</span> <span class=k>class</span> <span class=nc>DbContext</span> <span class=p>:</span>
+    <span class=n>IInfrastructure</span><span class=p>&lt;</span><span class=n>IServiceProvider</span><span class=p>&gt;,</span>
+    <span class=n>IDbContextDependencies</span><span class=p>,</span>
+    <span class=n>IDbSetCache</span><span class=p>,</span>
+    <span class=n>IDbContextPoolable</span>
+<span class=p>{</span>
+    <span class=k>private</span> <span class=k>readonly</span> <span class=n>DbContextOptions</span> <span class=m>_</span><span class=n>options</span><span class=p>;</span>
+
+    <span class=k>private</span> <span class=n>IDictionary</span><span class=p>&lt;(</span><span class=n>Type</span> <span class=n>Type</span><span class=p>,</span> <span class=kt>string?</span> <span class=n>Name</span><span class=p>),</span> <span class=kt>object</span><span class=p>&gt;?</span> <span class=m>_</span><span class=n>sets</span><span class=p>;</span>
+    <span class=k>private</span> <span class=n>IDbContextServices</span><span class=p>?</span> <span class=m>_</span><span class=n>contextServices</span><span class=p>;</span>
+    <span class=k>private</span> <span class=n>IDbContextDependencies</span><span class=p>?</span> <span class=m>_d</span><span class=n>bContextDependencies</span><span class=p>;</span>
+    <span class=k>private</span> <span class=n>DatabaseFacade</span><span class=p>?</span> <span class=m>_d</span><span class=n>atabase</span><span class=p>;</span>
+    <span class=k>private</span> <span class=n>ChangeTracker</span><span class=p>?</span> <span class=m>_</span><span class=n>changeTracker</span><span class=p>;</span>
+    
+    <span class=cm>/* ... */</span>
+
+    <span class=k>public</span> <span class=n>DbContext</span><span class=p>(</span><span class=n>DbContextOptions</span> <span class=n>options</span><span class=p>)</span>
+    <span class=p>{</span>
+        <span class=n>Check</span><span class=p>.</span><span class=n>NotNull</span><span class=p>(</span><span class=n>options</span><span class=p>,</span> <span class=n>nameof</span><span class=p>(</span><span class=n>options</span><span class=p>));</span>
+        <span class=cm>/* ... */</span>
+    <span class=p>}</span>
+
+    <span class=n>IDbSetSource</span> <span class=n>IDbContextDependencies</span><span class=p>.</span><span class=n>SetSource</span>
+        <span class=p>=&gt;</span> <span class=n>DbContextDependencies</span><span class=p>.</span><span class=n>SetSource</span><span class=p>;</span>
+
+    <span class=k>public</span> <span class=k>virtual</span> <span class=n>ChangeTracker</span> <span class=n>ChangeTracker</span> 
+        <span class=p>=&gt;</span> <span class=m>_</span><span class=n>changeTracker</span> <span class=p>??=</span> <span class=n>InternalServiceProvider</span><span class=p>.</span><span class=n>GetRequiredService</span><span class=p>&lt;</span><span class=n>IChangeTrackerFactory</span><span class=p>&gt;().</span><span class=n>Create</span><span class=p>();</span>
+
+    <span class=cm>/* ... */</span>
+
+    <span class=kt>object</span> <span class=n>IDbSetCache</span><span class=p>.</span><span class=n>GetOrAddSet</span><span class=p>(</span><span class=n>IDbSetSource</span> <span class=n>source</span><span class=p>,</span> <span class=n>Type</span> <span class=n>type</span><span class=p>)</span> <span class=p>{</span> <span class=p>}</span>
+
+    <span class=cm>/* ... */</span>
+
+    <span class=kt>object</span> <span class=n>IDbSetCache</span><span class=p>.</span><span class=n>GetOrAddSet</span><span class=p>(</span><span class=n>IDbSetSource</span> <span class=n>source</span><span class=p>,</span> <span class=kt>string</span> <span class=n>entityTypeName</span><span class=p>,</span> <span class=n>Type</span> <span class=n>type</span><span class=p>)</span> <span class=p>{</span> <span class=p>}</span>
+
+    <span class=cm>/* ... */</span>
+<span class=p>}</span>
+</code></pre></div><h2 id=analisando-dbcontextcs>Analisando DbContext.cs:<a href=#analisando-dbcontextcs class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<ul>
+<li><b>Princípio da Segregação de Interface:</b> A classe DbContext já trabalhou nesse princípio e dividiu suas interfaces em várias partes, cada uma com sua responsabilidade, e não ficou apenas em uma interface &ldquo;gorda&rdquo;.</li>
+<li>O namespace já foi declarado com a nova sintaxe do C# 10, fiz uma pesquisa rápida e no dia 21/Nov/2021 foi feito um <a href=https://github.com/dotnet/efcore/pull/26774>Pull Request</a> refatorando todos os namespaces do projeto.</li>
+<li>Todos os métodos (e até propriedades!) das interfaces, <a href=https://docs.microsoft.com/pt-br/dotnet/csharp/programming-guide/interfaces/explicit-interface-implementation>foram implementadas explicitamente!</a></li>
+<li>Propriedades declaradas em interfaces apenas como <code>{ get }</code> já estão sendo implementadas utilizando a nova sintaxe de lambda para propriedades read-only.</li>
+<li>Propriedades são declaradas com tipos estáticos como interfaces ou classes abstrata e futuramente são atribuídas com classes concretas que implementam essas interfaces ou herdam de classes abstratas.</li>
+</ul>
+<blockquote>
+<p>“An abstraction should not depend upon details, but details should depend upon abstractions. When you declare variables, you should always use static types such as an interface or abstract class. Concrete classes that implement the interface or inherit from the abstract class can then be assigned to the variable.” - Jason Alls</p>
+</blockquote>
+<ul>
+<li>Variáveis privadas começa com o prefixo &ldquo;_&rdquo;, seguindo as <a href=https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions>convenções de código da Microsoft</a>.</li>
+<li><code>_options</code> é marcado como <code>readonly</code> por ser atribuido apenas no construtor.</li>
+<li>Alguns métodos <code>private</code> não contém comentários, por quê?</li>
+<li>No construtor foi utilizado o método <code>Check.NotNull()</code> para verificar se o argumento <code>options</code> não é nulo, sem ele a biblioteca não funcionaria. Em primeiro momento, pensei que a classe <code>Check</code> era de terceiros, mas não, eles mesmos criaram essa classe estática que faz a verificação de vários valores.</li>
+</ul>
+<h2 id=checkcs>Check.cs:<a href=#checkcs class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p><code>src/Shared/Check.cs</code></p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-csharp data-lang=csharp><span class=k>namespace</span> <span class=nn>Microsoft.EntityFrameworkCore.Utilities</span><span class=p>;</span>
+
+<span class=k>internal</span> <span class=k>static</span> <span class=k>class</span> <span class=nc>Check</span>
+<span class=p>{</span>
+    <span class=cm>/* ... */</span>
+    <span class=k>public</span> <span class=k>static</span> <span class=n>T</span> <span class=n>NotNull</span><span class=p>&lt;</span><span class=n>T</span><span class=p>&gt;(</span><span class=kt>string</span> <span class=n>parameterName</span><span class=p>)</span> <span class=p>{</span> <span class=p>}</span>
+
+    <span class=cm>/* ... */</span>
+    <span class=k>public</span> <span class=k>static</span> <span class=n>IReadOnlyList</span><span class=p>&lt;</span><span class=n>T</span><span class=p>&gt;</span> <span class=n>NotEmpty</span><span class=p>&lt;</span><span class=n>T</span><span class=p>&gt;(</span><span class=kt>string</span> <span class=n>parameterName</span><span class=p>)</span> <span class=p>{</span> <span class=p>}</span>
+
+    <span class=cm>/* ... */</span>
+    <span class=k>public</span> <span class=k>static</span> <span class=kt>string</span> <span class=n>NotEmpty</span><span class=p>(</span><span class=kt>string?</span> <span class=k>value</span><span class=p>,</span> <span class=kt>string</span> <span class=n>parameterName</span><span class=p>)</span>
+    <span class=p>{</span> <span class=p>}</span>
+<span class=p>}</span>
+</code></pre></div><h2 id=analisando-checkcs>Analisando Check.cs:<a href=#analisando-checkcs class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<ul>
+<li>A classe foi organizada dentro do namespace <code>Utilities</code>. Pesquisei no Google e a biblioteca Azure SDK <a href=https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/mgmtcommon/Auth/Az.Auth/Az.Authentication/Utilities/Check.cs>fez algo parecido (até o nome do namespace é igual)!</a></li>
+<li>O arquivo da classe foi criada fora do EFCore, ela fica dentro da pasta &ldquo;Shared&rdquo;.</li>
+<li><b>Princípio da Responsabilidade Única:</b> a classe só tem um objetivo: verificar por valores nulos ou vazios.</li>
+<li>A classe é estática e não contém propriedades ou campos estáticos, o que evita memory leak, ponto positivo!</li>
+</ul>
+<blockquote>
+<p>“Any object that is referenced by a static variable is marked as not to be collected by the garbage collector. This is because static variables that reference objects are Garbage Collection (GC) roots, and anything that is a GC root is marked by the garbage collector as do not collect.” - Jason Alls</p>
+</blockquote>
+<ul>
+<li>Os métodos não têm comentários, ponto negativo.</li>
+<li>Linhas em branco importam para separar lógicas! Repare que fizeram commits apenas para inserir uma linha em branco antes do lançamento de uma exception.
+<img src=2021-12-21-19-43-00.png alt="Minor formatting!"></li>
+</ul>
+<h2 id=dbsettentitycs>DbSet&lt;TEntity>.cs<a href=#dbsettentitycs class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p><code>DbSet</code> é utilizado para criar consultas ou salvar instâncias de entidades que serão traduzidas para queries no banco de dados.</p>
+<p>Veja um exemplo de contexto, isso desperta minha curiosidade, como é feita a captura das propriedades do tipo DbSets&lt;> na classe base DbContext?</p>
+<p><code>src/EFCore/DbSet.cs</code></p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-csharp data-lang=csharp><span class=k>public</span> <span class=k>class</span> <span class=nc>SampleContext</span> <span class=p>:</span> <span class=n>DbContext</span>
+<span class=p>{</span>
+    <span class=k>public</span> <span class=n>DbSet</span><span class=p>&lt;</span><span class=n>Book</span><span class=p>&gt;</span> <span class=n>Books</span> <span class=p>{</span> <span class=k>get</span><span class=p>;</span> <span class=k>set</span><span class=p>;</span> <span class=p>}</span>
+    <span class=k>public</span> <span class=n>DbSet</span><span class=p>&lt;</span><span class=n>Author</span><span class=p>&gt;</span> <span class=n>Authors</span> <span class=p>{</span> <span class=k>get</span><span class=p>;</span> <span class=k>set</span><span class=p>;</span> <span class=p>}</span>
+<span class=p>}</span>
+</code></pre></div><h2 id=dbsetfinder>DbSetFinder<a href=#dbsetfinder class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>DbSetFinder, como o nome diz, é responsável por procurar propriedadades <code>DbSet&lt;TEntity></code> em classes que herdam de <code>DbContext.cs</code>.</p>
+<p>Pra isso, o pessoal do EFCore criou a interface <code>IDbSetFinder</code> e a classe <code>DbSetFinder</code> implementa essa interface.</p>
+<p><code>src/EFCore/Infrastructure/IDbSetFinder.cs</code></p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-csharp data-lang=csharp><span class=k>namespace</span> <span class=nn>Microsoft.EntityFrameworkCore.Infrastructure</span><span class=p>;</span>
+
+<span class=k>public</span> <span class=k>interface</span> <span class=n>IDbSetFinder</span>
+<span class=p>{</span>
+    <span class=n>IReadOnlyList</span><span class=p>&lt;</span><span class=n>DbSetProperty</span><span class=p>&gt;</span> <span class=n>FindSets</span><span class=p>(</span><span class=n>Type</span> <span class=n>contextType</span><span class=p>);</span>
+<span class=p>}</span>
+
+</code></pre></div><p><code>src/EFCore/Infrastructure/Internal/DbSetFinder.cs</code></p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-csharp data-lang=csharp><span class=k>namespace</span> <span class=nn>Microsoft.EntityFrameworkCore.Infrastructure.Internal</span><span class=p>;</span>
+
+<span class=k>public</span> <span class=k>class</span> <span class=nc>DbSetFinder</span> <span class=p>:</span> <span class=n>IDbSetFinder</span>
+<span class=p>{</span>
+    <span class=cm>/* ... */</span>
+    <span class=k>public</span> <span class=k>virtual</span> <span class=n>IReadOnlyList</span><span class=p>&lt;</span><span class=n>DbSetProperty</span><span class=p>&gt;</span> <span class=n>FindSets</span><span class=p>(</span><span class=n>Type</span> <span class=n>contextType</span><span class=p>)</span>
+        <span class=p>=&gt;</span> <span class=m>_</span><span class=n>cache</span><span class=p>.</span><span class=n>GetOrAdd</span><span class=p>(</span><span class=n>contextType</span><span class=p>,</span> <span class=n>FindSetsNonCached</span><span class=p>);</span>
+
+    <span class=cm>/* ... */</span>
+    <span class=k>private</span> <span class=k>static</span> <span class=n>DbSetProperty</span><span class=p>[]</span> <span class=n>FindSetsNonCached</span><span class=p>(</span><span class=n>Type</span> <span class=n>contextType</span><span class=p>)</span>
+    <span class=p>{</span>
+        <span class=cm>/* ... */</span>
+        <span class=k>return</span> <span class=n>contextType</span><span class=p>.</span><span class=n>GetRuntimeProperties</span><span class=p>().</span><span class=cm>/* ... */</span><span class=p>.</span><span class=n>ToArray</span><span class=p>();</span>
+    <span class=p>}</span>
+<span class=p>}</span>
+</code></pre></div><h2 id=analisando>Analisando<a href=#analisando class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<ul>
+<li>Os nomes são legíveis, compreensíveis para humanos e significativos em relação à intenção do código, mas curtos o suficiente para não irritar outros programadores.</li>
+<li><code>ConcurrentDictionary</code> é instânciado utilizando a nova expressão de invocação do construtor disponível na versão 9.0 do C#.</li>
+<li>Para capturar todas as propriedades, o EFCore faz uso de Reflection e LINQ.</li>
+</ul>
+<blockquote>
+<p>“The code should be checked to see whether the naming conventions have been followed for
+the various code constructs, such as classes, interfaces, member variables, local variables,
+enumerations, and methods. Nobody likes cryptic names that are hard to decipher,
+especially if the code base is large. As the reviewer, you must be able to read the code and understand it. If the code is difficult to read and understand, then it really needs to be refactored before being merged.” - Jason Alls</p>
+</blockquote>
+<h2 id=dbsetinitializer>DbSetInitializer<a href=#dbsetinitializer class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>Ao invés do DbSetFinder ser chamado no DbContext, uma outra classe faz essa mediação: a <code>DbSetInitializer</code>.</p>
+<p><code>src\EFCore\Internal\IDbSetInitializer.cs</code></p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-csharp data-lang=csharp><span class=k>namespace</span> <span class=nn>Microsoft.EntityFrameworkCore.Internal</span><span class=p>;</span>
+
+<span class=k>public</span> <span class=k>interface</span> <span class=n>IDbSetInitializer</span>
+<span class=p>{</span>
+    <span class=k>void</span> <span class=n>InitializeSets</span><span class=p>(</span><span class=n>DbContext</span> <span class=n>context</span><span class=p>);</span>
+<span class=p>}</span>
+</code></pre></div><p><code>src\EFCore\Internal\DbSetInitializer.cs</code></p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-csharp data-lang=csharp><span class=k>namespace</span> <span class=nn>Microsoft.EntityFrameworkCore.Internal</span><span class=p>;</span>
+
+<span class=k>public</span> <span class=k>class</span> <span class=nc>DbSetInitializer</span> <span class=p>:</span> <span class=n>IDbSetInitializer</span>
+<span class=p>{</span>
+    <span class=k>private</span> <span class=k>readonly</span> <span class=n>IDbSetFinder</span> <span class=m>_</span><span class=n>setFinder</span><span class=p>;</span>
+    <span class=k>private</span> <span class=k>readonly</span> <span class=n>IDbSetSource</span> <span class=m>_</span><span class=n>setSource</span><span class=p>;</span>
+
+    <span class=k>public</span> <span class=n>DbSetInitializer</span><span class=p>(</span>
+        <span class=n>IDbSetFinder</span> <span class=n>setFinder</span><span class=p>,</span>
+        <span class=n>IDbSetSource</span> <span class=n>setSource</span><span class=p>)</span>
+    <span class=p>{</span>
+        <span class=m>_</span><span class=n>setFinder</span> <span class=p>=</span> <span class=n>setFinder</span><span class=p>;</span>
+        <span class=m>_</span><span class=n>setSource</span> <span class=p>=</span> <span class=n>setSource</span><span class=p>;</span>
+    <span class=p>}</span>
+
+    <span class=k>public</span> <span class=k>virtual</span> <span class=k>void</span> <span class=n>InitializeSets</span><span class=p>(</span><span class=n>DbContext</span> <span class=n>context</span><span class=p>)</span>
+    <span class=p>{</span>
+        <span class=k>foreach</span> <span class=p>(</span><span class=kt>var</span> <span class=n>setInfo</span> <span class=k>in</span> <span class=m>_</span><span class=n>setFinder</span><span class=p>.</span><span class=n>FindSets</span><span class=p>(</span><span class=n>context</span><span class=p>.</span><span class=n>GetType</span><span class=p>()).</span><span class=n>Where</span><span class=p>(</span><span class=n>p</span> <span class=p>=&gt;</span> <span class=n>p</span><span class=p>.</span><span class=n>Setter</span> <span class=p>!=</span> <span class=k>null</span><span class=p>))</span>
+        <span class=p>{</span>
+            <span class=cm>/** ... **/</span>
+        <span class=p>}</span>
+    <span class=p>}</span>
+<span class=p>}</span>
+</code></pre></div><h2 id=analisando-1>Analisando<a href=#analisando-1 class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<ul>
+<li><b>Lei de Demeter:</b> a classe não desobedece a lei de demeter, cada unidade de código tem um conhecimento limitado.</li>
+<li>Todos os campos são marcados como <code>readonly</code> por não serem atribuídos após a construtor.</li>
+</ul>
+<p><code>src\EFCore\DbContext.cs</code></p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-csharp data-lang=csharp><span class=k>namespace</span> <span class=nn>Microsoft.EntityFrameworkCore</span><span class=p>;</span>
+
+<span class=k>public</span> <span class=k>class</span> <span class=nc>DbContext</span> <span class=p>:</span>
+    <span class=n>IInfrastructure</span><span class=p>&lt;</span><span class=n>IServiceProvider</span><span class=p>&gt;,</span>
+    <span class=n>IDbContextDependencies</span><span class=p>,</span>
+    <span class=n>IDbSetCache</span><span class=p>,</span>
+    <span class=n>IDbContextPoolable</span>
+<span class=p>{</span>
+    <span class=cm>/** ... **/</span>
+    <span class=k>public</span> <span class=n>DbContext</span><span class=p>(</span><span class=n>DbContextOptions</span> <span class=n>options</span><span class=p>)</span>
+    <span class=p>{</span>
+        <span class=cm>/** ... **/</span>
+
+        <span class=n>ServiceProviderCache</span><span class=p>.</span><span class=n>Instance</span><span class=p>.</span><span class=n>GetOrAdd</span><span class=p>(</span><span class=n>options</span><span class=p>,</span> <span class=n>providerRequired</span><span class=p>:</span> <span class=k>false</span><span class=p>)</span>
+            <span class=p>.</span><span class=n>GetRequiredService</span><span class=p>&lt;</span><span class=n>IDbSetInitializer</span><span class=p>&gt;()</span>
+            <span class=p>.</span><span class=n>InitializeSets</span><span class=p>(</span><span class=k>this</span><span class=p>);</span>
+
+        <span class=cm>/** ... **/</span>
+    <span class=p>}</span>
+<span class=p>}</span>
+</code></pre></div><h2 id=considerações-finais>Considerações finais<a href=#considerações-finais class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<ul>
+<li>Sempre referenciar interfaces ao invés de tipos concretos.</li>
+<li>Utilizar novas funcionalidades da linguagem para facilitar leitura e manter o código sempre atualizado.</li>
+<li>Escrever classes com apenas uma responsabilidade.</li>
+<li>Evitar métodos grandes e com mais de 10 linhas.</li>
+</ul>
+<blockquote>
+<p>“Large methods are not nice to read and understand. They can also lead to very hard-to-find bugs. Another problem with large methods is they can lose sight of their original intent. It&rsquo;s even worse when you come across large methods that have sections separated by comments and code wrapped in regions.” - Jason Alls</p>
+</blockquote>
+<ul>
+<li>Ah! Reconheci o uso de Fluent interface em vários pontos da biblioteca, e utilizar esse design pattern não inflige a lei de demeter (Ex: <code>src\EFCore\ModelBuilder.cs</code>).</li>
+</ul>
+</div>
+<hr class=post-end>
+<footer class=post-info>
+<p>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83.0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7" y2="7"/></svg><span class=tag><a href=https://rafaelmfonseca.github.io/tags/opensource>OpenSource</a></span><span class=tag><a href=https://rafaelmfonseca.github.io/tags/github>GitHub</a></span><span class=tag><a href=https://rafaelmfonseca.github.io/tags/c>C#</a></span><span class=tag><a href=https://rafaelmfonseca.github.io/tags/solid>SOLID</a></span><span class=tag><a href=https://rafaelmfonseca.github.io/tags/designpatterns>DesignPatterns</a></span>
+</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>1194 Words</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>21-12-2021 18:40 +0000</p>
+</footer>
+</article>
+<div class="post-nav thin">
+<a class=next-post href=https://rafaelmfonseca.github.io/posts/analise-open-source-parte-2/>
+<span class=post-nav-label><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>&nbsp;Newer</span><br><span>Análise Open Source - Parte 2</span>
+</a>
+<a class=prev-post href=https://rafaelmfonseca.github.io/posts/criando-website-hugo-github-pages-github-actions/>
+<span class=post-nav-label>Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span><br><span>Criando um website com Hugo no GitHub Pages e GitHub Actions.</span>
+</a>
+</div>
+<div id=comments class=thin>
+<div id=disqus_thread></div>
+<script type=application/javascript>var disqus_config=function(){};(function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById('disqus_thread').innerHTML='Disqus comments not available by default when the website is previewed locally.';return}var b=document,a=b.createElement('script');a.async=!0,a.src='//rafaelmfonseca.disqus.com/embed.js',a.setAttribute('data-timestamp',+new Date),(b.head||b.body).appendChild(a)})()</script>
+<noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript>
+<a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a>
+</div>
+</main>
+<footer id=site-footer class="section-inner thin animated fadeIn faster">
+<p>&copy; 2022 <a href=https://rafaelmfonseca.github.io/>Rafael Moreira Fonseca</a>&#183; <a href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank rel=noopener>CC BY-NC 4.0</a></p>
+<p>
+Made with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> &#183; Theme <a href=https://github.com/Track3/hermit target=_blank rel=noopener>Hermit</a> &#183; <a href=https://rafaelmfonseca.github.io/posts/index.xml target=_blank title=rss><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 019 9"/><path d="M4 4a16 16 0 0116 16"/><circle cx="5" cy="19" r="1"/></svg></a>
+</p>
+</footer>
+<script src=https://rafaelmfonseca.github.io/js/bundle.min.7d8545daa55d62427355498dd8da13f98ff79a7938ce7d2a5e2ae1ec0de3beb8.js integrity="sha256-fYVF2qVdYkJzVUmN2NoT+Y/3mnk4zn0qXirh7A3jvrg=" crossorigin=anonymous></script>
+</body>
+</html>

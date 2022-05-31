@@ -1,0 +1,138 @@
+<!doctype html><html lang=en-us>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="ie=edge">
+<meta name=theme-color content="#494f5c">
+<meta name=msapplication-TileColor content="#494f5c">
+<meta itemprop=name content="Design Pattern: Expor versão não genérica de interfaces genéricas">
+<meta itemprop=description content="Se você está familiarizado com o ambiente .NET, com certeza já ouviu falar da interface IEnumerable<T> utilizada para iterar listas em instruções foreach, porém antes do namespace System.Collections.Generic ser criado, existia apenas o IEnumerable(não genérico) do namespace System.Collections.
+Hoje, IEnumerable<T> estende de IEnumerable:
+namespace System.Collections { public interface IEnumerable { IEnumerator GetEnumerator(); } } namespace System.Collections.Generic { public interface IEnumerable<out T> : IEnumerable { new IEnumerator<T> GetEnumerator(); } } Veja as vantagens de implementar esse padrão:  Essa herança faz sentido para não quebrar códigos legado e permite mais generalidade, fornecendo uma implementação não genérica para os consumidores."><meta itemprop=datePublished content="2021-12-24T01:52:00+00:00">
+<meta itemprop=dateModified content="2021-12-24T01:52:00+00:00">
+<meta itemprop=wordCount content="150">
+<meta itemprop=keywords content="OpenSource,GitHub,C#,SOLID,Patterns,"><meta property="og:title" content="Design Pattern: Expor versão não genérica de interfaces genéricas">
+<meta property="og:description" content="Se você está familiarizado com o ambiente .NET, com certeza já ouviu falar da interface IEnumerable<T> utilizada para iterar listas em instruções foreach, porém antes do namespace System.Collections.Generic ser criado, existia apenas o IEnumerable(não genérico) do namespace System.Collections.
+Hoje, IEnumerable<T> estende de IEnumerable:
+namespace System.Collections { public interface IEnumerable { IEnumerator GetEnumerator(); } } namespace System.Collections.Generic { public interface IEnumerable<out T> : IEnumerable { new IEnumerator<T> GetEnumerator(); } } Veja as vantagens de implementar esse padrão:  Essa herança faz sentido para não quebrar códigos legado e permite mais generalidade, fornecendo uma implementação não genérica para os consumidores.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://rafaelmfonseca.github.io/posts/design-pattern-expor-versao-nao-generica-interfaces-generica/"><meta property="article:section" content="posts">
+<meta property="article:published_time" content="2021-12-24T01:52:00+00:00">
+<meta property="article:modified_time" content="2021-12-24T01:52:00+00:00">
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="Design Pattern: Expor versão não genérica de interfaces genéricas">
+<meta name=twitter:description content="Se você está familiarizado com o ambiente .NET, com certeza já ouviu falar da interface IEnumerable<T> utilizada para iterar listas em instruções foreach, porém antes do namespace System.Collections.Generic ser criado, existia apenas o IEnumerable(não genérico) do namespace System.Collections.
+Hoje, IEnumerable<T> estende de IEnumerable:
+namespace System.Collections { public interface IEnumerable { IEnumerator GetEnumerator(); } } namespace System.Collections.Generic { public interface IEnumerable<out T> : IEnumerable { new IEnumerator<T> GetEnumerator(); } } Veja as vantagens de implementar esse padrão:  Essa herança faz sentido para não quebrar códigos legado e permite mais generalidade, fornecendo uma implementação não genérica para os consumidores.">
+<link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png>
+<link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png>
+<link rel=manifest href=/site.webmanifest>
+<link rel=mask-icon href=/safari-pinned-tab.svg color>
+<link rel="shortcut icon" href=/favicon.ico>
+<title>Design Pattern: Expor versão não genérica de interfaces genéricas</title>
+<link rel=stylesheet href=https://rafaelmfonseca.github.io/css/style.min.eac77496566fd7d5768fd650ddb0b2b181ca6a2d7c5fdd6fe6b8ba4bf47e566f.css integrity="sha256-6sd0llZv19V2j9ZQ3bCysYHKai18X91v5ri6S/R+Vm8=" crossorigin=anonymous>
+<link rel=stylesheet href=https://rafaelmfonseca.github.io/css/disqusfix.css>
+</head>
+<body id=page>
+<header id=site-header class="animated slideInUp">
+<div class="hdr-wrapper section-inner">
+<div class=hdr-left>
+<div class=site-branding>
+<a href=https://rafaelmfonseca.github.io/>Rafael Moreira Fonseca</a>
+</div>
+<nav class="site-nav hide-in-mobile">
+<a href=https://rafaelmfonseca.github.io/posts/>Posts</a>
+</nav>
+</div>
+<div class="hdr-right hdr-icons">
+<span class="hdr-social hide-in-mobile"><a href=https://github.com/RafaelMFonseca target=_blank rel="noopener me" title=Github><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37.0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44.0 0020 4.77 5.07 5.07.0 0019.91 1S18.73.65 16 2.48a13.38 13.38.0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07.0 005 4.77 5.44 5.44.0 003.5 8.55c0 5.42 3.3 6.61 6.44 7A3.37 3.37.0 009 18.13V22"/></svg></a><a href=https://www.linkedin.com/in/rafael-moreira-fonseca/ target=_blank rel="noopener me" title=Linkedin><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a></span><button id=menu-btn class=hdr-btn title=Menu><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+</div>
+</div>
+</header>
+<div id=mobile-menu class="animated fast">
+<ul>
+<li><a href=https://rafaelmfonseca.github.io/posts/>Posts</a></li>
+</ul>
+</div>
+<main class="site-main section-inner animated fadeIn faster">
+<article class=thin>
+<header class=post-header>
+<div class=post-meta><span>Dec 24, 2021</span></div>
+<h1>Design Pattern: Expor versão não genérica de interfaces genéricas</h1>
+</header>
+<div class=content>
+<p>Se você está familiarizado com o ambiente .NET, com certeza já ouviu falar da interface <code>IEnumerable&lt;T></code> utilizada para iterar listas em instruções <code>foreach</code>, porém antes do namespace <code>System.Collections.Generic</code> ser criado, existia apenas o <code>IEnumerable</code>(não genérico) do namespace <code>System.Collections</code>.</p>
+<p>Hoje, <code>IEnumerable&lt;T></code> estende de <code>IEnumerable</code>:</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-csharp data-lang=csharp><span class=k>namespace</span> <span class=nn>System.Collections</span>
+<span class=p>{</span>
+    <span class=k>public</span> <span class=k>interface</span> <span class=n>IEnumerable</span>
+    <span class=p>{</span>
+        <span class=n>IEnumerator</span> <span class=n>GetEnumerator</span><span class=p>();</span>
+    <span class=p>}</span>
+<span class=p>}</span>
+
+<span class=k>namespace</span> <span class=nn>System.Collections.Generic</span>
+<span class=p>{</span>
+    <span class=k>public</span> <span class=k>interface</span> <span class=n>IEnumerable</span><span class=p>&lt;</span><span class=k>out</span> <span class=n>T</span><span class=p>&gt;</span> <span class=p>:</span> <span class=n>IEnumerable</span>
+    <span class=p>{</span>
+        <span class=k>new</span> <span class=n>IEnumerator</span><span class=p>&lt;</span><span class=n>T</span><span class=p>&gt;</span> <span class=n>GetEnumerator</span><span class=p>();</span>
+    <span class=p>}</span>
+<span class=p>}</span>
+</code></pre></div><h2 id=veja-as-vantagens-de-implementar-esse-padrão>Veja as vantagens de implementar esse padrão:<a href=#veja-as-vantagens-de-implementar-esse-padrão class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<ul>
+<li>Essa herança faz sentido para não quebrar códigos legado e permite mais generalidade, fornecendo uma implementação não genérica para os consumidores.</li>
+<li>Durante o uso do operador <code>is</code>, não é necessário informar o tipo do genérico.</li>
+</ul>
+<p>Exemplo:</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-csharp data-lang=csharp><span class=kt>object</span> <span class=n>validator</span> <span class=p>=</span> <span class=k>new</span> <span class=n>ValidatorImpl</span><span class=p>();</span>
+
+<span class=k>if</span> <span class=p>(</span><span class=n>validator</span> <span class=k>is</span> <span class=n>Validator</span><span class=p>&lt;</span><span class=kt>int</span><span class=p>&gt;)</span> <span class=cm>/** Precisa informar o tipo **/</span>
+<span class=p>{</span>
+
+<span class=p>}</span>
+<span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=n>validator</span> <span class=k>is</span> <span class=n>Validator</span><span class=p>)</span> <span class=cm>/** Não precisa informar o tipo **/</span>
+<span class=p>{</span>
+
+<span class=p>}</span>
+</code></pre></div><p>Fontes: <br>
+<a href=https://stackoverflow.com/questions/9197465/>https://stackoverflow.com/questions/9197465/</a> <br>
+<a href=https://stackoverflow.com/questions/6623188/>https://stackoverflow.com/questions/6623188/</a> <br>
+<a href=https://gamedev.stackexchange.com/questions/145037/>https://gamedev.stackexchange.com/questions/145037/</a> <br>
+<a href=https://stackoverflow.com/questions/16112353/>https://stackoverflow.com/questions/16112353/</a> <br>
+<a href=https://whatheco.de/2015/12/15/non-generic-wrapper-instead-of-base-class-or-interface/>https://whatheco.de/2015/12/15/non-generic-wrapper-instead-of-base-class-or-interface/</a> <br>
+<a href=https://whatheco.de/2011/07/02/casting-to-less-generic-types/>https://whatheco.de/2011/07/02/casting-to-less-generic-types/</a> <br></p>
+</div>
+<hr class=post-end>
+<footer class=post-info>
+<p>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83.0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7" y2="7"/></svg><span class=tag><a href=https://rafaelmfonseca.github.io/tags/opensource>OpenSource</a></span><span class=tag><a href=https://rafaelmfonseca.github.io/tags/github>GitHub</a></span><span class=tag><a href=https://rafaelmfonseca.github.io/tags/c>C#</a></span><span class=tag><a href=https://rafaelmfonseca.github.io/tags/solid>SOLID</a></span><span class=tag><a href=https://rafaelmfonseca.github.io/tags/patterns>Patterns</a></span>
+</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>150 Words</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>24-12-2021 01:52 +0000</p>
+</footer>
+</article>
+<div class="post-nav thin">
+<a class=next-post href=https://rafaelmfonseca.github.io/posts/geracao-procedural/>
+<span class=post-nav-label><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>&nbsp;Newer</span><br><span>Você conhece a técnica de geração procedural em jogos digitais?</span>
+</a>
+<a class=prev-post href=https://rafaelmfonseca.github.io/posts/analise-open-source-parte-2/>
+<span class=post-nav-label>Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span><br><span>Análise Open Source - Parte 2</span>
+</a>
+</div>
+<div id=comments class=thin>
+<div id=disqus_thread></div>
+<script type=application/javascript>var disqus_config=function(){};(function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById('disqus_thread').innerHTML='Disqus comments not available by default when the website is previewed locally.';return}var b=document,a=b.createElement('script');a.async=!0,a.src='//rafaelmfonseca.disqus.com/embed.js',a.setAttribute('data-timestamp',+new Date),(b.head||b.body).appendChild(a)})()</script>
+<noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript>
+<a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a>
+</div>
+</main>
+<footer id=site-footer class="section-inner thin animated fadeIn faster">
+<p>&copy; 2022 <a href=https://rafaelmfonseca.github.io/>Rafael Moreira Fonseca</a>&#183; <a href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank rel=noopener>CC BY-NC 4.0</a></p>
+<p>
+Made with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> &#183; Theme <a href=https://github.com/Track3/hermit target=_blank rel=noopener>Hermit</a> &#183; <a href=https://rafaelmfonseca.github.io/posts/index.xml target=_blank title=rss><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 019 9"/><path d="M4 4a16 16 0 0116 16"/><circle cx="5" cy="19" r="1"/></svg></a>
+</p>
+</footer>
+<script src=https://rafaelmfonseca.github.io/js/bundle.min.7d8545daa55d62427355498dd8da13f98ff79a7938ce7d2a5e2ae1ec0de3beb8.js integrity="sha256-fYVF2qVdYkJzVUmN2NoT+Y/3mnk4zn0qXirh7A3jvrg=" crossorigin=anonymous></script>
+</body>
+</html>

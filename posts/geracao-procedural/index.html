@@ -1,0 +1,168 @@
+<!doctype html><html lang=en-us>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=x-ua-compatible content="ie=edge">
+<meta name=theme-color content="#494f5c">
+<meta name=msapplication-TileColor content="#494f5c">
+<meta itemprop=name content="Você conhece a técnica de geração procedural em jogos digitais?">
+<meta itemprop=description content="A geração procedural é um assunto que vem se popularizando nos últimos anos entre os desenvolvedores de jogos indies. A utilização dessa técnica para geração de leveis e terrenos de jogos é adotado por programadores que não desejam limitar o conteúdo de seus games, abrindo portas para criar uma quantidade infinita de recursos. Hoje, vamos discurtir as principais vantagens e desvantagens de usar esse tipo de técnica, e saber quando a utilização desses algorítmos pode se tornar favorável para o seu projeto."><meta itemprop=datePublished content="2022-05-25T12:00:00+00:00">
+<meta itemprop=dateModified content="2022-05-25T12:00:00+00:00">
+<meta itemprop=wordCount content="754">
+<meta itemprop=keywords content><meta property="og:title" content="Você conhece a técnica de geração procedural em jogos digitais?">
+<meta property="og:description" content="A geração procedural é um assunto que vem se popularizando nos últimos anos entre os desenvolvedores de jogos indies. A utilização dessa técnica para geração de leveis e terrenos de jogos é adotado por programadores que não desejam limitar o conteúdo de seus games, abrindo portas para criar uma quantidade infinita de recursos. Hoje, vamos discurtir as principais vantagens e desvantagens de usar esse tipo de técnica, e saber quando a utilização desses algorítmos pode se tornar favorável para o seu projeto.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://rafaelmfonseca.github.io/posts/geracao-procedural/"><meta property="article:section" content="posts">
+<meta property="article:published_time" content="2022-05-25T12:00:00+00:00">
+<meta property="article:modified_time" content="2022-05-25T12:00:00+00:00">
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="Você conhece a técnica de geração procedural em jogos digitais?">
+<meta name=twitter:description content="A geração procedural é um assunto que vem se popularizando nos últimos anos entre os desenvolvedores de jogos indies. A utilização dessa técnica para geração de leveis e terrenos de jogos é adotado por programadores que não desejam limitar o conteúdo de seus games, abrindo portas para criar uma quantidade infinita de recursos. Hoje, vamos discurtir as principais vantagens e desvantagens de usar esse tipo de técnica, e saber quando a utilização desses algorítmos pode se tornar favorável para o seu projeto.">
+<link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png>
+<link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png>
+<link rel=manifest href=/site.webmanifest>
+<link rel=mask-icon href=/safari-pinned-tab.svg color>
+<link rel="shortcut icon" href=/favicon.ico>
+<title>Você conhece a técnica de geração procedural em jogos digitais?</title>
+<link rel=stylesheet href=https://rafaelmfonseca.github.io/css/style.min.eac77496566fd7d5768fd650ddb0b2b181ca6a2d7c5fdd6fe6b8ba4bf47e566f.css integrity="sha256-6sd0llZv19V2j9ZQ3bCysYHKai18X91v5ri6S/R+Vm8=" crossorigin=anonymous>
+<link rel=stylesheet href=https://rafaelmfonseca.github.io/css/disqusfix.css>
+</head>
+<body id=page>
+<header id=site-header class="animated slideInUp">
+<div class="hdr-wrapper section-inner">
+<div class=hdr-left>
+<div class=site-branding>
+<a href=https://rafaelmfonseca.github.io/>Rafael Moreira Fonseca</a>
+</div>
+<nav class="site-nav hide-in-mobile">
+<a href=https://rafaelmfonseca.github.io/posts/>Posts</a>
+</nav>
+</div>
+<div class="hdr-right hdr-icons">
+<span class="hdr-social hide-in-mobile"><a href=https://github.com/RafaelMFonseca target=_blank rel="noopener me" title=Github><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37.0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44.0 0020 4.77 5.07 5.07.0 0019.91 1S18.73.65 16 2.48a13.38 13.38.0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07.0 005 4.77 5.44 5.44.0 003.5 8.55c0 5.42 3.3 6.61 6.44 7A3.37 3.37.0 009 18.13V22"/></svg></a><a href=https://www.linkedin.com/in/rafael-moreira-fonseca/ target=_blank rel="noopener me" title=Linkedin><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a></span><button id=menu-btn class=hdr-btn title=Menu><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+</div>
+</div>
+</header>
+<div id=mobile-menu class="animated fast">
+<ul>
+<li><a href=https://rafaelmfonseca.github.io/posts/>Posts</a></li>
+</ul>
+</div>
+<main class="site-main section-inner animated fadeIn faster">
+<article class=thin>
+<header class=post-header>
+<div class=post-meta><span>May 25, 2022</span></div>
+<h1>Você conhece a técnica de geração procedural em jogos digitais?</h1>
+</header>
+<div class=content>
+<p>A geração procedural é um assunto que vem se popularizando nos últimos anos entre os desenvolvedores de jogos indies. <br>
+A utilização dessa técnica para geração de leveis e terrenos de jogos é adotado por programadores que não desejam limitar o conteúdo de seus games, abrindo portas para criar uma quantidade infinita de recursos. Hoje, vamos discurtir as principais vantagens e desvantagens de usar esse tipo de técnica, e saber quando a utilização desses algorítmos pode se tornar favorável para o seu projeto.</p>
+<h2 id=afinal-o-que-são-esses-algoritmos-procedurais>Afinal, o que são esses algoritmos procedurais?<a href=#afinal-o-que-são-esses-algoritmos-procedurais class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>É uma abordagem de junção de vários algoritmos e/ou dados aleatórios que são encadeados para gerar valores com formatos conhecidos e úteis. Um dos exemplos mais famosos é o cálculo do matemático Ken Perlin, o Perlin Noise, onde o seu resultado pode ser usado para criar imagens parecidas com essa:</p>
+<p><img src=2022-05-27-12-14-17.png alt></p>
+<center><i style=font-size:12px>[Imagem gerada com perlin noise.]</i></center>
+<p>É importante observar que a imagem é composta por variações de apenas duas cores: preto e branco, <strong>sendo a cor preta representado pelo valor 0.0f e a branca pelo valor 1.0f</strong>. No game engine Unity, cada pixel pode ser gerado utilizando o método estático <code>Mathf.PerlinNoise(x, y)</code>, mas para isso você também deve informar as coordenadas x e y.</p>
+<div class=highlight><pre tabindex=0 class=chroma><code class=language-csharp data-lang=csharp><span class=k>using</span> <span class=nn>System</span><span class=p>;</span>
+<span class=k>using</span> <span class=nn>UnityEngine</span><span class=p>;</span>
+<span class=k>using</span> <span class=nn>UnityEngine.UI</span><span class=p>;</span>
+
+<span class=c1>/// &lt;summary&gt;
+</span><span class=c1>/// Classe responsável por criar uma textura e preenchê-la com perlin noise.
+</span><span class=c1>/// Alterar o valor do campo &#34;noiseScale&#34; pode gerar resultados diferentes.
+</span><span class=c1>/// &lt;/summary&gt;
+</span><span class=c1></span><span class=k>public</span> <span class=k>class</span> <span class=nc>GeracaoProcedural</span> <span class=p>:</span> <span class=n>MonoBehaviour</span>
+<span class=p>{</span>
+<span class=na>    [SerializeField]</span> <span class=k>public</span> <span class=n>RawImage</span> <span class=n>image</span><span class=p>;</span>
+<span class=na>    [SerializeField]</span> <span class=k>public</span> <span class=kt>int</span> <span class=n>textureWidth</span> <span class=p>=</span> <span class=m>256</span><span class=p>;</span>
+<span class=na>    [SerializeField]</span> <span class=k>public</span> <span class=kt>int</span> <span class=n>textureHeight</span> <span class=p>=</span> <span class=m>256</span><span class=p>;</span>
+<span class=na>    [SerializeField]</span> <span class=k>public</span> <span class=kt>float</span> <span class=n>noiseScale</span> <span class=p>=</span> <span class=m>30.0f</span><span class=p>;</span>
+
+    <span class=k>public</span> <span class=k>void</span> <span class=n>Start</span><span class=p>()</span> <span class=p>=&gt;</span> <span class=n>GenerateNoise</span><span class=p>();</span>
+
+    <span class=k>private</span> <span class=k>void</span> <span class=n>GenerateNoise</span><span class=p>()</span>
+    <span class=p>{</span>
+        <span class=kt>var</span> <span class=n>texture</span> <span class=p>=</span> <span class=k>new</span> <span class=n>Texture2D</span><span class=p>(</span><span class=n>textureWidth</span><span class=p>,</span> <span class=n>textureHeight</span><span class=p>);</span>
+        <span class=kt>var</span> <span class=n>colors</span> <span class=p>=</span> <span class=k>new</span> <span class=n>Color32</span><span class=p>[</span><span class=n>texture</span><span class=p>.</span><span class=n>width</span> <span class=p>*</span> <span class=n>texture</span><span class=p>.</span><span class=n>height</span><span class=p>];</span>
+
+        <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>x</span> <span class=p>=</span> <span class=m>0</span><span class=p>;</span> <span class=n>x</span> <span class=p>&lt;</span> <span class=n>texture</span><span class=p>.</span><span class=n>width</span><span class=p>;</span> <span class=n>x</span><span class=p>++)</span>
+        <span class=p>{</span>
+            <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>y</span> <span class=p>=</span> <span class=m>0</span><span class=p>;</span> <span class=n>y</span> <span class=p>&lt;</span> <span class=n>texture</span><span class=p>.</span><span class=n>height</span><span class=p>;</span> <span class=n>y</span><span class=p>++)</span>
+            <span class=p>{</span>
+                <span class=kt>float</span> <span class=n>xCoord</span> <span class=p>=</span> <span class=n>x</span> <span class=p>/</span> <span class=n>noiseScale</span><span class=p>;</span>
+                <span class=kt>float</span> <span class=n>yCoord</span> <span class=p>=</span> <span class=n>y</span> <span class=p>/</span> <span class=n>noiseScale</span><span class=p>;</span>
+                <span class=kt>byte</span> <span class=n>noiseValue</span> <span class=p>=</span> <span class=p>(</span><span class=kt>byte</span><span class=p>)</span> <span class=p>(</span><span class=n>Mathf</span><span class=p>.</span><span class=n>PerlinNoise</span><span class=p>(</span><span class=n>xCoord</span><span class=p>,</span> <span class=n>yCoord</span><span class=p>)</span> <span class=p>*</span> <span class=m>255</span><span class=p>);</span>
+
+                <span class=n>colors</span><span class=p>[</span><span class=n>y</span> <span class=p>*</span> <span class=n>texture</span><span class=p>.</span><span class=n>width</span> <span class=p>+</span> <span class=n>x</span><span class=p>]</span> <span class=p>=</span> <span class=k>new</span> <span class=n>Color32</span><span class=p>(</span><span class=n>noiseValue</span><span class=p>,</span> <span class=n>noiseValue</span><span class=p>,</span> <span class=n>noiseValue</span><span class=p>,</span> <span class=m>255</span><span class=p>);</span>
+            <span class=p>}</span>
+        <span class=p>}</span>
+
+        <span class=n>texture</span><span class=p>.</span><span class=n>SetPixels32</span><span class=p>(</span><span class=n>colors</span><span class=p>);</span>
+        <span class=n>texture</span><span class=p>.</span><span class=n>Apply</span><span class=p>();</span>
+
+        <span class=n>image</span><span class=p>.</span><span class=n>texture</span> <span class=p>=</span> <span class=n>texture</span><span class=p>;</span>
+    <span class=p>}</span>
+<span class=p>}</span>
+</code></pre></div><p>Imaginando o cenário de que o valor <strong>1.0f</strong> pode ser o ponto mais alto de uma montanha, o <strong>Perlin Noise possibilita a geração de terrenos proceduralmente</strong>:</p>
+<p><img src=2022-05-25-16-11-38.png alt></p>
+<center><i style=font-size:12px>[Terreno configurado a partir do valores gerado pelo perlin noise.]</i></center>
+<h2 id=em-busca-do-realismo-utilizando-a-combinações-de-algoritmos>Em busca do realismo utilizando a combinações de algoritmos<a href=#em-busca-do-realismo-utilizando-a-combinações-de-algoritmos class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>Só o Perlin Noise não é suficiente, para tornar o cenário agradável aos olhos dos jogadores, a combinações de <strong>noises</strong> se torna crucial na criação de terrenos. Na imagem abaixo utilizei os algoritmos: <strong>Perlin Noise</strong>, <strong>Erosion</strong>, <strong>Terrace</strong> e <strong>Shore Line</strong>.</p>
+<p><img src=2022-05-25-16-22-14.png alt></p>
+<center><i style=font-size:12px>[Terreno mais detalhado usando combinações de algoritmos.]</i></center>
+<h2 id=mas-todas-essas-combinações-de-algoritmos-impactam-na-performance>Mas todas essas combinações de algoritmos impactam na performance?<a href=#mas-todas-essas-combinações-de-algoritmos-impactam-na-performance class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>A geração procedural exige um alto processamento da CPU para realizar os cálculos em tempo de execução, principalmente se o terreno for gerado automaticamente em volta do Player. Utilizando as técnicas de otimizações corretas, como a divisão do terrenos em chunks (dividir um grande terreno em partes) e a aplicação de object pooling (reutilização de objetos descartados), é possível alcançar resultados em que o processamento fique imperceptível para o usuário. <br></p>
+<p><img src=2022-05-26-10-50-26.png alt></p>
+<center><i style=font-size:12px>[Terreno dividido em 9 partes (chunks).]</i></center>
+<h2 id=geração-procedural-está-presente-em-todo-lugar>Geração procedural está presente em todo lugar<a href=#geração-procedural-está-presente-em-todo-lugar class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>Os setores de efeitos visuais e videogames usam a geração procedural para a criação de materiais PBR e texturas 3D. <br>
+Hoje, a Adobe lidera a indústria de criação de materiais com seu software premiado: Substance Designer. <br>
+Essa ferramenta pode auxiliar e gerar variações infinitas de texturas através de nós interligados.</p>
+<p><img src=2022-05-26-11-23-12.png alt></p>
+<center><i style=font-size:12px>[Textura de couro renderizado pelo Substance Designer]</i></center>
+<h2 id=nem-tudo-é-perfeito>Nem tudo é perfeito<a href=#nem-tudo-é-perfeito class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>Infelizmente, com o tempo, você pode notar padrões nas soluções procedurais, as repetições ficam claras e o ambiente pode não ser tão diverso. Para evitar que o jogador note demais essas estruturas repetitivas, cria-se uma necessidade de usar combinações de ambientes feitos à mão com ferramentas que utilizam algoritmos procedurais.</p>
+<p><img src=2022-05-26-14-31-02.png alt></p>
+<center><i style=font-size:12px>[Repetição de objetos no planeta gerado proceduralmente pelo jogo "No Man's Sky".]</i></center>
+<h3 id=vantagens>Vantagens<a href=#vantagens class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<ul>
+<li>Permite criar conteúdo dinamicamente.</li>
+<li>É possível a geração de terrenos gigantes e recursos infinitos.</li>
+<li>Alta reusabilidade, alterar apenas alguns valores e parâmetros pode gerar um novo conteúdo.</li>
+</ul>
+<h3 id=desvantagens>Desvantagens<a href=#desvantagens class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h3>
+<ul>
+<li>O conteúdo gerado proceduralmente pode parecer repetitivo e entediante.</li>
+<li>A geração depende da potência do hardware.</li>
+<li>Exige mais conhecimento de programação.</li>
+</ul>
+<h2 id=conclusão>Conclusão<a href=#conclusão class=anchor aria-hidden=true><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 015 5 5 5 0 01-5 5h-3m-6 0H6a5 5 0 01-5-5 5 5 0 015-5h3"/><line x1="8" y1="12" x2="16" y2="12"/></svg></a></h2>
+<p>Por fim, esse artigo faz reflexão de que as ferramentas e algoritmos procedurais são técnicas incríveis na programação de jogos, isso ajuda automatizar a criação de certos dados. Vários jogos geram ambientes ou criaturas proceduralmente durante o produto final, mas vale você avaliar se o seu projeto se encaixa nessa categoria.</p>
+</div>
+<hr class=post-end>
+<footer class=post-info>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6A2 2 0 004 4v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>754 Words</p>
+<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>25-05-2022 12:00 +0000</p>
+</footer>
+</article>
+<div class="post-nav thin">
+<a class=prev-post href=https://rafaelmfonseca.github.io/posts/design-pattern-expor-versao-nao-generica-interfaces-generica/>
+<span class=post-nav-label>Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span><br><span>Design Pattern: Expor versão não genérica de interfaces genéricas</span>
+</a>
+</div>
+<div id=comments class=thin>
+<div id=disqus_thread></div>
+<script type=application/javascript>var disqus_config=function(){};(function(){if(["localhost","127.0.0.1"].indexOf(window.location.hostname)!=-1){document.getElementById('disqus_thread').innerHTML='Disqus comments not available by default when the website is previewed locally.';return}var b=document,a=b.createElement('script');a.async=!0,a.src='//rafaelmfonseca.disqus.com/embed.js',a.setAttribute('data-timestamp',+new Date),(b.head||b.body).appendChild(a)})()</script>
+<noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript>
+<a href=https://disqus.com class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a>
+</div>
+</main>
+<footer id=site-footer class="section-inner thin animated fadeIn faster">
+<p>&copy; 2022 <a href=https://rafaelmfonseca.github.io/>Rafael Moreira Fonseca</a>&#183; <a href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank rel=noopener>CC BY-NC 4.0</a></p>
+<p>
+Made with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> &#183; Theme <a href=https://github.com/Track3/hermit target=_blank rel=noopener>Hermit</a> &#183; <a href=https://rafaelmfonseca.github.io/posts/index.xml target=_blank title=rss><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 019 9"/><path d="M4 4a16 16 0 0116 16"/><circle cx="5" cy="19" r="1"/></svg></a>
+</p>
+</footer>
+<script src=https://rafaelmfonseca.github.io/js/bundle.min.7d8545daa55d62427355498dd8da13f98ff79a7938ce7d2a5e2ae1ec0de3beb8.js integrity="sha256-fYVF2qVdYkJzVUmN2NoT+Y/3mnk4zn0qXirh7A3jvrg=" crossorigin=anonymous></script>
+</body>
+</html>
